@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="600" fill="#f8f9fa"/>
+    
+    <!-- Title -->
+    <text x="400" y="50" font-family="Arial" font-size="28" fill="#2c3e50" text-anchor="middle" font-weight="bold">Prefix Expression Evaluation</text>
+    
+    <!-- Example Expression -->
+    <text x="400" y="100" font-family="Arial" font-size="24" fill="#2c3e50" text-anchor="middle">Example: + 3 * 4 2</text>
+    
+    <!-- Steps -->
+    <g transform="translate(50, 150)">
+        <!-- Step 1 -->
+        <rect x="0" y="0" width="700" height="100" fill="white" stroke="#2c3e50" stroke-width="2" rx="5"/>
+        <text x="20" y="30" font-family="Arial" font-size="18" fill="#2c3e50">Step 1: Read from right to left</text>
+        <text x="20" y="60" font-family="Arial" font-size="18" fill="#2c3e50">Stack: [2, 4]</text>
+        <text x="20" y="90" font-family="Arial" font-size="18" fill="#2c3e50">Next: * (operator)</text>
+        
+        <!-- Step 2 -->
+        <rect x="0" y="120" width="700" height="100" fill="white" stroke="#2c3e50" stroke-width="2" rx="5"/>
+        <text x="20" y="150" font-family="Arial" font-size="18" fill="#2c3e50">Step 2: Pop two operands and apply *</text>
+        <text x="20" y="180" font-family="Arial" font-size="18" fill="#2c3e50">4 * 2 = 8</text>
+        <text x="20" y="210" font-family="Arial" font-size="18" fill="#2c3e50">Stack: [8, 3]</text>
+        
+        <!-- Step 3 -->
+        <rect x="0" y="240" width="700" height="100" fill="white" stroke="#2c3e50" stroke-width="2" rx="5"/>
+        <text x="20" y="270" font-family="Arial" font-size="18" fill="#2c3e50">Step 3: Pop two operands and apply +</text>
+        <text x="20" y="300" font-family="Arial" font-size="18" fill="#2c3e50">3 + 8 = 11</text>
+        <text x="20" y="330" font-family="Arial" font-size="18" fill="#2c3e50">Final Result: 11</text>
+    </g>
+    
+    <!-- Legend -->
+    <g transform="translate(50, 500)">
+        <rect x="0" y="0" width="700" height="60" fill="white" stroke="#2c3e50" stroke-width="2" rx="5"/>
+        <text x="20" y="30" font-family="Arial" font-size="16" fill="#2c3e50">Key Points:</text>
+        <text x="120" y="30" font-family="Arial" font-size="16" fill="#2c3e50">1. Read from right to left</text>
+        <text x="320" y="30" font-family="Arial" font-size="16" fill="#2c3e50">2. Push operands onto stack</text>
+        <text x="520" y="30" font-family="Arial" font-size="16" fill="#2c3e50">3. Apply operators to top two operands</text>
+    </g>
+</svg> 
