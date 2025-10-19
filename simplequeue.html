@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Game - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #FFB6C1;    /* Light Pink */
+            --secondary-color: #FFC0CB;   /* Pink */
+            --tertiary-color: #FFD1DC;    /* Pale Pink */
+            --quaternary-color: #FFE4E1;   /* Misty Rose */
+            --text-color: #8B5A5A;        /* Dark Pink */ 
+            --background-color: #FFF0F5;   /* Lavender Blush */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .queue-type-selection {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .queue-type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(139, 90, 90, 0.2);
+        }
+
+        .queue-type-card.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            color: white;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+            border: 2px solid var(--primary-color);
+            display: block;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .instructions h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+
+        /* Simple Queue Styles */
+        .simple-queue-container {
+            width: 600px;
+            height: 200px;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(139, 90, 90, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Circular Queue Styles */
+        .circular-queue-container {
+            width: 400px;
+            height: 400px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px rgba(139, 90, 90, 0.1);
+            display: block !important;
+        }
+
+        .circular-queue-container.visible {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .circular-queue-slot {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+        }
+
+        .circular-queue-slot.empty {
+            background: rgba(255, 182, 193, 0.3);
+            border: 2px dashed var(--primary-color);
+        }
+
+        .circular-queue-slot.enqueue-anim {
+            animation: enqueuePop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes enqueuePop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Double Ended Queue Styles */
+        .deque-container {
+            width: 600px;
+            height: 200px;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(139, 90, 90, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .queue-element {
+            width: 100px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 8px;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            opacity: 1;
+        }
+
+        .queue-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            padding: 6px 18px;
+            margin: 0 10px;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .queue-label.front { background: linear-gradient(135deg, #FF69B4, var(--primary-color)); }
+        .queue-label.rear { background: linear-gradient(135deg, var(--primary-color), #FF69B4); }
+
+        .queue-indicator {
+            padding: 5px 10px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin: 0 10px;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+        }
+
+        .queue-indicator.front {
+            background: linear-gradient(135deg, #FF69B4, var(--primary-color));
+        }
+
+        .queue-indicator.rear {
+            background: linear-gradient(135deg, var(--primary-color), #FF69B4);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .controls .form-control {
+            width: 120px;
+            height: 38px;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .controls .btn-queue {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, #FFB6C1, #FFD1DC);
+            border: none;
+            color: #8B5A5A;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 8px;
+            box-shadow: none;
+            transition: all 0.3s ease;
+        }
+
+        .controls .btn-queue:hover {
+            background: linear-gradient(135deg, #FFD1DC, #FFB6C1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.08);
+        }
+
+        .controls .form-select {
+            height: 38px;
+            padding: 0 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        #dequeElements {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        /* Custom Alert Styles */
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(139, 90, 90, 0.2);
+            z-index: 1000;
+            text-align: center;
+            display: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 3px solid var(--primary-color);
+            max-width: 400px;
+        }
+
+        .custom-alert h3 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .custom-alert p {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .custom-alert .close-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .custom-alert .close-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.2);
+        }
+
+        .alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .deque-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        /* Animations */
+        @keyframes enqueueSlideIn {
+            0% { transform: translateX(60px) scale(0.7); opacity: 0; }
+            80% { transform: translateX(-8px) scale(1.08); opacity: 1; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes dequeueSlideOut {
+            0% { transform: translateX(0) scale(1); opacity: 1; }
+            100% { transform: translateX(60px) scale(0.7); opacity: 0; }
+        }
+        .queue-element.enqueue-anim {
+            animation: enqueueSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .queue-element.dequeue-anim {
+            animation: dequeueSlideOut 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Add peek overlay styles */
+        .peek-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .peek-overlay.visible {
+            opacity: 1;
+        }
+
+        .peek-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .peek-overlay.visible .peek-content {
+            transform: scale(1);
+        }
+
+        .peek-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        /* Add new styles */
+        .queue-size-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .queue-size-input .form-control {
+            width: 80px;
+            height: 38px;
+            text-align: center;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .queue-size-input .btn-queue {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .queue-size-input .btn-queue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.2);
+        }
+
+        .size-warning {
+            color: #C62828;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .game-message {
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0 0 0.5rem 0;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .game-message.success {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            color: #2E7D32;
+        }
+
+        .game-message.error {
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            color: #C62828;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Update dequeue animation */
+        @keyframes dequeueSlideOut {
+            0% { 
+                transform: translateX(0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateX(100px) scale(0.7); 
+                opacity: 0; 
+            }
+        }
+
+        .queue-element.dequeue-anim {
+            animation: dequeueSlideOut 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Update level objectives styling to match stack game */
+        .level-objectives {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.1);
+        }
+
+        .level-objectives h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .level-objectives p {
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        /* Sound control button */
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sound-control:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-control i {
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .sound-control.muted i::before {
+            content: "\f6a9";  /* Font Awesome mute icon */
+        }
+
+        .sound-control:not(.muted) i::before {
+            content: "\f028";  /* Font Awesome volume-up icon */
+        }
+
+        /* Queue info styling */
+        .queue-info {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-operations, .queue-properties {
+            margin-bottom: 1.5rem;
+        }
+
+        .queue-operations h4, .queue-properties h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .queue-operations ul, .queue-properties ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .queue-operations li, .queue-properties li {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 5px;
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .queue-operations li strong {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn">←</a>
+
+    <!-- Add sound control button -->
+    <button class="sound-control" id="soundControl" title="Toggle Sound">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <div class="container">
+        <h1 class="text-center my-4">Queue Game</h1>
+        
+        <!-- Queue Type Selection -->
+        <div class="queue-type-selection">
+            <h3 class="mb-4">Choose a Queue Type</h3>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="queue-type-card selected" data-type="simple">
+                        <h4>Simple Queue</h4>
+                        <p>Basic FIFO (First In First Out) queue with operations at one end</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card" data-type="circular" onclick="window.location.href='circularqueue.html'">
+                        <h4>Circular Queue</h4>
+                        <p>Queue with circular structure for efficient memory usage</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card" data-type="deque" onclick="window.location.href='doubleendedqueue.html'">
+                        <h4>Double Ended Queue</h4>
+                        <p>Queue with operations possible at both ends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simple Queue Game -->
+        <div id="simpleQueueGame" class="game-container">
+            <h2 class="text-center">Simple Queue</h2>
+
+            <!-- Add current objective at top -->
+            <div class="level-objectives">
+                <h4>🎯 Current Objective:</h4>
+                <p id="simpleQueueObjective" style="font-size: 1.2rem; font-weight: bold; font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">Loading objective...</p>
+            </div>
+
+            <!-- Game message will appear here -->
+            <div id="simpleQueueGameMessage" class="game-message"></div>
+
+            <div class="queue-size-input text-center mb-3">
+                <input type="number" id="simpleQueueSizeInput" class="form-control" placeholder="Enter queue size" min="1" max="9" value="5" style="width: 120px; display: inline-block; margin-right: 10px;">
+                <button class="btn-queue" id="setSimpleQueueSizeBtn">Set Size</button>
+                <div class="size-warning" id="simpleQueueSizeWarning" style="display: none; color: #C62828; margin-top: 0.5rem;">Please enter a size between 1 and 9</div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-center">
+                <span class="queue-label front">Front</span>
+                <div class="simple-queue-container" id="simpleQueueElements"></div>
+                <span class="queue-label rear">Rear</span>
+            </div>
+
+            <div class="controls">
+                <input type="text" class="form-control" id="simpleQueueInput" placeholder="Enter value" maxlength="4">
+                <button class="btn-queue" id="enqueueBtn">Enqueue</button>
+                <button class="btn-queue" id="dequeueBtn">Dequeue</button>
+                <button class="btn-queue" id="peekBtn">Peek</button>
+            </div>
+
+            <!-- Instructions section -->
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <ol>
+                    <li>First, set your desired queue size (1-9)</li>
+                    <li>Enter a value in the input field</li>
+                    <li>Click "Enqueue" to add the value to the rear of the queue</li>
+                    <li>Click "Dequeue" to remove the value from the front of the queue</li>
+                    <li>Click "Peek" to see the front element without removing it</li>
+                    <li>Elements follow FIFO (First In First Out) principle</li>
+                </ol>
+            </div>
+
+            <!-- Queue Operations and Properties section -->
+            <div class="queue-info">
+                <div class="queue-operations">
+                    <h4>Queue Operations:</h4>
+                    <ul>
+                        <li><strong>Enqueue:</strong> Adds an element to the rear of the queue</li>
+                        <li><strong>Dequeue:</strong> Removes an element from the front of the queue</li>
+                        <li><strong>Peek:</strong> Views the front element without removing it</li>
+                        <li><strong>isEmpty:</strong> Checks if the queue is empty</li>
+                        <li><strong>isFull:</strong> Checks if the queue is full</li>
+                    </ul>
+                </div>
+
+                <div class="queue-properties">
+                    <h4>Queue Properties:</h4>
+                    <ul>
+                        <li>FIFO (First In First Out) structure</li>
+                        <li>Elements are added at the rear and removed from the front</li>
+                        <li>Only the front and rear elements are directly accessible</li>
+                        <li>Fixed size implementation</li>
+                        <li>Linear data structure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Double Ended Queue Game -->
+        <div id="dequeGame" class="game-container">
+            <h2 class="text-center">Double Ended Queue</h2>
+
+            <!-- Add current objective at top -->
+            <div class="level-objectives">
+                <h4>🎯 Current Objective:</h4>
+                <p id="dequeObjective" style="font-size: 1.2rem; font-weight: bold; font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">Loading objective...</p>
+            </div>
+
+            <!-- Game message will appear here -->
+            <div id="dequeGameMessage" class="game-message"></div>
+
+            <div class="queue-size-input text-center mb-3">
+                <input type="number" id="dequeSizeInput" class="form-control" placeholder="Size" min="1" max="10" value="10">
+                <button class="btn-queue" onclick="setDequeSize()">Set Size</button>
+                <div class="size-warning" id="dequeSizeWarning" style="display: none; color: #C62828; margin-top: 0.5rem;">Please enter a size between 1 and 10</div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-center">
+                <span class="queue-label front">Front</span>
+                <div class="simple-queue-container" id="dequeElements"></div>
+                <span class="queue-label rear">Rear</span>
+            </div>
+
+            <div class="controls">
+                <input type="text" class="form-control" id="dequeInput" placeholder="Enter value" maxlength="4">
+                <select class="form-select" id="insertPositionSelect">
+                    <option value="front">Front</option>
+                    <option value="rear">Rear</option>
+                </select>
+                <button class="btn-queue" onclick="insertDeque()">Insert</button>
+                <button class="btn-queue" onclick="deleteFront()">Delete Front</button>
+                <button class="btn-queue" onclick="deleteRear()">Delete Rear</button>
+                <button class="btn-queue" onclick="peekDeque()">Peek</button>
+            </div>
+
+            <!-- Instructions section -->
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <ol>
+                    <li>First, set your desired deque size (1-10)</li>
+                    <li>Enter a value in the input field</li>
+                    <li>Choose whether to insert at front or rear</li>
+                    <li>Click "Insert" to add the value to the selected end</li>
+                    <li>Click "Delete Front" to remove from front</li>
+                    <li>Click "Delete Rear" to remove from rear</li>
+                    <li>Click "Peek" to see the front element without removing it</li>
+                </ol>
+            </div>
+
+            <!-- Queue Operations and Properties section -->
+            <div class="queue-info">
+                <div class="queue-operations">
+                    <h4>Deque Operations:</h4>
+                    <ul>
+                        <li><strong>Insert Front:</strong> Adds an element to the front of the deque</li>
+                        <li><strong>Insert Rear:</strong> Adds an element to the rear of the deque</li>
+                        <li><strong>Delete Front:</strong> Removes an element from the front of the deque</li>
+                        <li><strong>Delete Rear:</strong> Removes an element from the rear of the deque</li>
+                        <li><strong>Peek:</strong> Views the front element without removing it</li>
+                    </ul>
+                </div>
+
+                <div class="queue-properties">
+                    <h4>Deque Properties:</h4>
+                    <ul>
+                        <li>Can function as both FIFO and LIFO</li>
+                        <li>Elements can be added/removed from both ends</li>
+                        <li>Dynamic size implementation</li>
+                        <li>Efficient access to both ends</li>
+                        <li>Versatile data structure for various applications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize global variables
+        let deque = [];
+        let MAX_DEQUE_SIZE = 10;
+
+        // Add deque objectives
+        const dequeObjectives = [
+            "Insert {size} elements at the front",
+            "Insert {size} elements at the rear",
+            "Insert {size/2} elements at front and {size/2} at rear",
+            "Create a deque with alternating front and rear insertions",
+            "Insert {size} elements and then remove all from front",
+            "Insert {size} elements and then remove all from rear",
+            "Create a palindrome using deque operations"
+        ];
+
+        function setRandomDequeObjective() {
+            const randomIndex = Math.floor(Math.random() * dequeObjectives.length);
+            let objective = dequeObjectives[randomIndex];
+            objective = objective.replace('{size}', MAX_DEQUE_SIZE);
+            objective = objective.replace('{size/2}', Math.floor(MAX_DEQUE_SIZE / 2));
+            document.getElementById('dequeObjective').textContent = objective;
+        }
+
+        function setDequeSize() {
+            const sizeInput = document.getElementById('dequeSizeInput');
+            const size = parseInt(sizeInput.value);
+            const warning = document.getElementById('dequeSizeWarning');
+
+            if (size >= 1 && size <= 10) {
+                MAX_DEQUE_SIZE = size;
+                deque = []; // Reset deque
+                updateDequeDisplay();
+                warning.style.display = 'none';
+                showDequeMessage(`Deque size set to ${size}`, "success");
+                setRandomDequeObjective();
+            } else {
+                warning.style.display = 'block';
+                showDequeMessage("Please enter a size between 1 and 10", "error");
+            }
+        }
+
+        function insertDeque() {
+            const input = document.getElementById('dequeInput');
+            const value = input.value.trim();
+            const position = document.getElementById('insertPositionSelect').value;
+            
+            if (value) {
+                if (value.length > 4) {
+                    showDequeMessage('Value is too long! Maximum 4 digits allowed.', "error");
+                    return;
+                }
+
+                if (!/^\d{1,4}$/.test(value)) {
+                    showDequeMessage('Please enter only digits (0-9)!', "error");
+                    return;
+                }
+
+                if (deque.length >= MAX_DEQUE_SIZE) {
+                    showDequeMessage('Deque is full!', "error");
+                    return;
+                }
+                
+                if (position === 'front') {
+                    deque.unshift(value);
+                    updateDequeDisplay('enqueue', 0);
+                } else {
+                    deque.push(value);
+                    updateDequeDisplay('enqueue', deque.length - 1);
+                }
+                
+                queueSound.enqueue();
+                input.value = '';
+                checkDequeObjective();
+            }
+        }
+
+        function deleteFront() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                return;
+            }
+            
+            const container = document.getElementById('dequeElements');
+            if (container.firstChild) {
+                container.firstChild.classList.add('dequeue-anim');
+                queueSound.dequeue();
+                setTimeout(() => {
+                    deque.shift();
+                    updateDequeDisplay();
+                    checkDequeObjective();
+                }, 400);
+            }
+        }
+
+        function deleteRear() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                return;
+            }
+            
+            const container = document.getElementById('dequeElements');
+            if (container.lastChild) {
+                container.lastChild.classList.add('dequeue-anim');
+                queueSound.dequeue();
+                setTimeout(() => {
+                    deque.pop();
+                    updateDequeDisplay();
+                    checkDequeObjective();
+                }, 400);
+            }
+        }
+
+        function updateDequeDisplay(animType, animIdx) {
+            const container = document.getElementById('dequeElements');
+            container.innerHTML = '';
+            
+            // Calculate element width based on deque size
+            const elementWidth = Math.min(100, 600 / MAX_DEQUE_SIZE);
+            
+            deque.forEach((value, idx) => {
+                const element = document.createElement('div');
+                element.className = 'queue-element';
+                element.style.width = `${elementWidth}px`;
+                element.textContent = value;
+                if (animType === 'enqueue' && idx === animIdx) {
+                    element.classList.add('enqueue-anim');
+                }
+                container.appendChild(element);
+            });
+        }
+
+        function checkDequeObjective() {
+            const objective = document.getElementById('dequeObjective').textContent;
+            
+            if (objective.includes("Insert") && !objective.includes("and then")) {
+                const targetSize = parseInt(objective.match(/\d+/)[0]);
+                if (deque.length === targetSize) {
+                    showDequeMessage("Objective Completed! 🎉", "success");
+                    setTimeout(setRandomDequeObjective, 2000);
+                }
+            } else if (objective.includes("remove")) {
+                if (deque.length === 0) {
+                    showDequeMessage("Objective Completed! 🎉", "success");
+                    setTimeout(setRandomDequeObjective, 2000);
+                }
+            }
+        }
+
+        function showDequeMessage(message, type) {
+            const messageElement = document.getElementById('dequeGameMessage');
+            messageElement.textContent = message;
+            messageElement.className = `game-message ${type}`;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 2000);
+        }
+
+        function peekDeque() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                return;
+            }
+
+            const frontElement = deque[0];
+            
+            // Create peek overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'peek-overlay';
+            
+            const content = document.createElement('div');
+            content.className = 'peek-content';
+            
+            const value = document.createElement('div');
+            value.className = 'peek-value';
+            value.textContent = frontElement;
+            
+            content.appendChild(value);
+            overlay.appendChild(content);
+            document.body.appendChild(overlay);
+            
+            // Show overlay
+            setTimeout(() => {
+                overlay.classList.add('visible');
+            }, 10);
+            
+            // Remove overlay after 1 second
+            setTimeout(() => {
+                overlay.classList.remove('visible');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }, 1000);
+        }
+
+        // Initialize global variables for simple queue
+        let simpleQueue = [];
+        let MAX_SIMPLE_QUEUE_SIZE = 5;
+        let usedObjectives = new Set();
+        let currentObjectiveIndex = -1;  // Track current objective index
+
+        const simpleQueueObjectives = [
+            {
+                task: "Enqueue {size} elements into the queue",
+                check: () => simpleQueue.length === MAX_SIMPLE_QUEUE_SIZE,
+                message: "Great job! You've filled the queue!"
+            },
+            {
+                task: "Create a queue with all even numbers",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Number(num) % 2 === 0),
+                message: "Excellent! All numbers are even!"
+            },
+            {
+                task: "Create a queue with numbers in ascending order",
+                check: () => {
+                    if (simpleQueue.length < 2) return false;
+                    for (let i = 0; i < simpleQueue.length - 1; i++) {
+                        if (Number(simpleQueue[i]) > Number(simpleQueue[i + 1])) return false;
+                    }
+                    return true;
+                },
+                message: "Perfect! The queue is in ascending order!"
+            },
+            {
+                task: "Create a queue with elements in Fibonacci sequence",
+                check: () => {
+                    if (simpleQueue.length < 3) return false;
+                    for (let i = 2; i < simpleQueue.length; i++) {
+                        const current = Number(simpleQueue[i]);
+                        const prev1 = Number(simpleQueue[i - 1]);
+                        const prev2 = Number(simpleQueue[i - 2]);
+                        if (current !== prev1 + prev2) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! You've created a Fibonacci sequence!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 3",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Number(num) % 3 === 0),
+                message: "Excellent! All numbers are multiples of 3!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 5",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Number(num) % 5 === 0),
+                message: "Great job! All numbers are multiples of 5!"
+            },
+            {
+                task: "Create a queue with no duplicate elements",
+                check: () => new Set(simpleQueue).size === simpleQueue.length,
+                message: "Perfect! Your queue has all unique elements!"
+            },
+            {
+                task: "Create a queue with elements in arithmetic sequence (difference of 2)",
+                check: () => {
+                    if (simpleQueue.length < 2) return false;
+                    for (let i = 1; i < simpleQueue.length; i++) {
+                        if (Number(simpleQueue[i]) - Number(simpleQueue[i - 1]) !== 2) return false;
+                    }
+                    return true;
+                },
+                message: "Brilliant! You've created a perfect arithmetic sequence!"
+            },
+            {
+                task: "Create a queue with elements in geometric sequence (ratio of 2)",
+                check: () => {
+                    if (simpleQueue.length < 2) return false;
+                    for (let i = 1; i < simpleQueue.length; i++) {
+                        if (Number(simpleQueue[i]) / Number(simpleQueue[i - 1]) !== 2) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! You've created a perfect geometric sequence!"
+            },
+            {
+                task: "Create a queue with all elements being perfect squares",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Math.sqrt(Number(num)) % 1 === 0),
+                message: "Amazing! All numbers are perfect squares!"
+            },
+            {
+                task: "Create a queue with all elements being prime numbers",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => {
+                    const n = Number(num);
+                    if (n <= 1) return false;
+                    for (let i = 2; i <= Math.sqrt(n); i++) {
+                        if (n % i === 0) return false;
+                    }
+                    return true;
+                }),
+                message: "Incredible! All numbers are prime!"
+            },
+            {
+                task: "Create a queue with sum of adjacent elements equal to 10",
+                check: () => {
+                    if (simpleQueue.length < 2) return false;
+                    for (let i = 0; i < simpleQueue.length - 1; i++) {
+                        if (Number(simpleQueue[i]) + Number(simpleQueue[i + 1]) !== 10) return false;
+                    }
+                    return true;
+                },
+                message: "Genius! All adjacent pairs sum to 10!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 4",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Number(num) % 4 === 0),
+                message: "Excellent! All numbers are multiples of 4!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 7",
+                check: () => simpleQueue.length > 0 && simpleQueue.every(num => Number(num) % 7 === 0),
+                message: "Perfect! All numbers are multiples of 7!"
+            },
+            {
+                task: "Create a queue with alternating even and odd numbers",
+                check: () => {
+                    if (simpleQueue.length < 2) return false;
+                    for (let i = 0; i < simpleQueue.length - 1; i++) {
+                        const current = Number(simpleQueue[i]) % 2;
+                        const next = Number(simpleQueue[i + 1]) % 2;
+                        if (current === next) return false;
+                    }
+                    return true;
+                },
+                message: "Impressive! You've created a perfect alternating pattern!"
+            }
+        ];
+
+        function getRandomObjective() {
+            // If all objectives have been used, reset the used objectives
+            if (usedObjectives.size === simpleQueueObjectives.length) {
+                usedObjectives.clear();
+            }
+
+            // Get a random objective that hasn't been used recently
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * simpleQueueObjectives.length);
+            } while (usedObjectives.has(randomIndex));
+
+            usedObjectives.add(randomIndex);
+            currentObjectiveIndex = randomIndex;
+            return randomIndex;
+        }
+
+        function setRandomSimpleQueueObjective() {
+            const randomIndex = getRandomObjective();
+            let objective = simpleQueueObjectives[randomIndex].task;
+            objective = objective.replace('{size}', MAX_SIMPLE_QUEUE_SIZE);
+            document.getElementById('simpleQueueObjective').textContent = objective;
+        }
+
+        function checkSimpleQueueObjective() {
+            if (currentObjectiveIndex === -1) return;
+            
+            const currentObjective = simpleQueueObjectives[currentObjectiveIndex];
+            if (currentObjective.check()) {
+                showSimpleQueueMessage(currentObjective.message, "success");
+                setTimeout(setRandomSimpleQueueObjective, 2000);
+            }
+        }
+
+        function showSimpleQueueMessage(message, type) {
+            const messageElement = document.getElementById('simpleQueueGameMessage');
+            messageElement.textContent = message;
+            messageElement.className = `game-message ${type}`;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 2000);
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show simple queue game by default
+            document.getElementById('simpleQueueGame').style.display = 'block';
+            document.getElementById('dequeGame').style.display = 'none';
+            
+            // Initialize simple queue
+            setRandomSimpleQueueObjective();
+            
+            // Add Enter key event listener for simple queue input
+            document.getElementById('simpleQueueInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const value = this.value.trim();
+                    if (value) {
+                        if (simpleQueue.length >= MAX_SIMPLE_QUEUE_SIZE) {
+                            showSimpleQueueMessage("Queue is full!", "error");
+                            return;
+                        }
+                        simpleQueue.push(value);
+                        updateSimpleQueueDisplay('enqueue', simpleQueue.length - 1);
+                        this.value = '';
+                        checkSimpleQueueObjective();
+                    }
+                }
+            });
+            
+            // Set up event listeners for simple queue buttons
+            document.getElementById('enqueueBtn').addEventListener('click', function() {
+                const value = document.getElementById('simpleQueueInput').value.trim();
+                if (value) {
+                    if (simpleQueue.length >= MAX_SIMPLE_QUEUE_SIZE) {
+                        showSimpleQueueMessage("Queue is full!", "error");
+                        return;
+                    }
+                    simpleQueue.push(value);
+                    updateSimpleQueueDisplay('enqueue', simpleQueue.length - 1);
+                    document.getElementById('simpleQueueInput').value = '';
+                    checkSimpleQueueObjective();
+                }
+            });
+
+            document.getElementById('dequeueBtn').addEventListener('click', function() {
+                if (simpleQueue.length === 0) {
+                    showSimpleQueueMessage("Queue is empty!", "error");
+                    return;
+                }
+                const firstElement = document.querySelector('.queue-element');
+                if (firstElement) {
+                    firstElement.classList.add('dequeue-anim');
+                    setTimeout(() => {
+                        simpleQueue.shift();
+                        updateSimpleQueueDisplay();
+                        checkSimpleQueueObjective();
+                    }, 400);
+                }
+            });
+
+            document.getElementById('peekBtn').addEventListener('click', function() {
+                if (simpleQueue.length === 0) {
+                    showSimpleQueueMessage("Queue is empty!", "error");
+                    return;
+                }
+                
+                const frontElement = simpleQueue[0];
+                
+                // Create peek overlay
+                const overlay = document.createElement('div');
+                overlay.className = 'peek-overlay';
+                
+                const content = document.createElement('div');
+                content.className = 'peek-content';
+                
+                const value = document.createElement('div');
+                value.className = 'peek-value';
+                value.textContent = frontElement;
+                
+                content.appendChild(value);
+                overlay.appendChild(content);
+                document.body.appendChild(overlay);
+                
+                // Show overlay
+                setTimeout(() => {
+                    overlay.classList.add('visible');
+                }, 10);
+                
+                // Remove overlay after 1 second
+                setTimeout(() => {
+                    overlay.classList.remove('visible');
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 300);
+                }, 1000);
+            });
+            
+            // Set size button event listener
+            document.getElementById('setSimpleQueueSizeBtn').addEventListener('click', function() {
+                const size = parseInt(document.getElementById('simpleQueueSizeInput').value);
+                if (size >= 1 && size <= 9) {
+                    MAX_SIMPLE_QUEUE_SIZE = size;
+                    simpleQueue = [];
+                    updateSimpleQueueDisplay();
+                    showSimpleQueueMessage(`Queue size set to ${size}`, "success");
+                    document.getElementById('simpleQueueSizeWarning').style.display = 'none';
+                } else {
+                    document.getElementById('simpleQueueSizeWarning').style.display = 'block';
+                    showSimpleQueueMessage("Please enter a size between 1 and 9", "error");
+                }
+            });
+
+            // Initialize with default size of 5
+            MAX_SIMPLE_QUEUE_SIZE = 5;
+            document.getElementById('simpleQueueSizeInput').value = '5';
+            updateSimpleQueueDisplay();
+
+            // Queue type selection
+            document.querySelectorAll('.queue-type-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.queue-type-card').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    
+                    // Hide all game containers
+                    document.querySelectorAll('.game-container').forEach(container => {
+                        container.style.display = 'none';
+                    });
+                    
+                    // Show the selected game container
+                    const type = this.dataset.type;
+                    const gameContainer = document.getElementById(`${type}QueueGame`);
+                    if (gameContainer) {
+                        gameContainer.style.display = 'block';
+                        
+                        // Initialize the selected queue type
+                        if (type === 'deque') {
+                            // Initialize deque
+                            MAX_DEQUE_SIZE = 10;
+                            deque = [];
+                            updateDequeDisplay();
+                            setRandomDequeObjective();
+                            
+                            // Set initial size in the input
+                            const sizeInput = document.getElementById('dequeSizeInput');
+                            if (sizeInput) {
+                                sizeInput.value = MAX_DEQUE_SIZE;
+                            }
+                            
+                            // Show initial size message
+                            showDequeMessage(`Deque size is set to ${MAX_DEQUE_SIZE}`, "success");
+                        }
+                    }
+                });
+            });
+
+            // Add input focus handlers
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.value = ''; // Clear input when focused
+                });
+            });
+
+            // Initialize the game container to be visible
+            document.getElementById('simpleQueueGame').style.display = 'block';
+            
+            // Add event listener for Enter key on size input
+            document.getElementById('queueSizeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    setQueueSize();
+                }
+            });
+
+            // Sound control button
+            const soundControl = document.getElementById('soundControl');
+            soundControl.addEventListener('click', () => {
+                const isMuted = soundEffect.toggleMute();
+                soundControl.classList.toggle('muted', isMuted);
+            });
+        });
+
+        function updateSimpleQueueDisplay(animType, animIdx) {
+            const container = document.getElementById('simpleQueueElements');
+            container.innerHTML = '';
+            
+            // Calculate element width based on queue size
+            const elementWidth = Math.min(100, 600 / MAX_SIMPLE_QUEUE_SIZE);
+            
+            simpleQueue.forEach((value, idx) => {
+                const element = document.createElement('div');
+                element.className = 'queue-element';
+                element.style.width = `${elementWidth}px`;
+                element.textContent = value;
+                if (animType === 'enqueue' && idx === animIdx) {
+                    element.classList.add('enqueue-anim');
+                }
+                container.appendChild(element);
+            });
+        }
+    </script>
+</body>
+</html> 

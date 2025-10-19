@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #050774;
+            --secondary-gradient: linear-gradient(90deg, #000000 0%, #ffffff 100%);
+            --accent-color: #e74c3c;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .list-info, .characteristics, .complexity, .applications, .pseudocode {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .list-info:hover, .characteristics:hover, .complexity:hover, .applications:hover, .pseudocode:hover {
+            transform: translateY(-5px);
+        }
+
+        .list-image {
+            text-align: center;
+            margin: 2rem 0;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .list-image:hover {
+            transform: scale(1.02);
+        }
+
+        .list-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .list-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .list-image p {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        .queue-types {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .queue-type {
+            background-color: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .queue-images {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .queue-images .queue-image {
+            flex: 1;
+            height: 300px;
+        }
+
+        .queue-image {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border-radius: 6px;
+            background-color: var(--card-bg);
+        }
+
+        .queue-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .queue-type:hover .queue-image img {
+            transform: scale(1.05);
+        }
+
+        .queue-type h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+            width: 100%;
+        }
+
+        .queue-type:hover h3 {
+            color: white;
+            border-bottom-color: white;
+        }
+
+        .queue-type p {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        li:before {
+            content: "→";
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateX(10px);
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        li:hover:before {
+            color: white;
+        }
+
+        pre {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        pre::before {
+            content: "Pseudocode";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .list-info, .characteristics, .complexity, .applications, .pseudocode {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animation classes */
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Add custom scrollbar styling */
+        .queue-types::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .queue-types::-webkit-scrollbar-track {
+            background: var(--background-color);
+            border-radius: 4px;
+        }
+
+        .queue-types::-webkit-scrollbar-thumb {
+            background: var(--secondary-color);
+            border-radius: 4px;
+        }
+
+        .queue-types::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+        }
+
+        /* Add navigation arrows */
+        .queue-types-container {
+            position: relative;
+            padding: 0;
+        }
+
+        /* Remove navigation arrows */
+        .queue-nav {
+            display: none;
+        }
+
+        /* Add styles for pseudocode sections */
+        .pseudocode-section {
+            margin-bottom: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .pseudocode-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .pseudocode-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .pseudocode-section pre {
+            margin: 0;
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+        
+    <div class="container animate-fade-in">
+        <h1 class="animate-slide-up">Queue Data Structure</h1>
+        
+        <div class="list-info animate-slide-up">
+            <h2>Queue Information</h2>
+            <p>A queue is a fundamental linear data structure that operates based on the First-In-First-Out (FIFO) principle. This means the first element added to the queue is always the first one to be removed. Elements are inserted at the back, known as the 'rear' or 'tail', and removed from the front, called the 'head'. Queues are essential in scenarios where order matters, such as task scheduling, printer queues, and message processing systems.</p>
+        </div>
+
+        <div class="list-image animate-slide-up">
+            <h2>Types of Queue</h2>
+            <div class="queue-types">
+                <div class="queue-type">
+                    <div class="queue-image">
+                        <img src="simplequeue.png" alt="Simple Queue Structure">
+                    </div>
+                    <h3>Simple Queue</h3>
+                    <p>A basic queue where elements are added at the rear and removed from the front. It follows strict FIFO principle and has a fixed size.</p>
+                </div>
+                <div class="queue-type">
+                    <div class="queue-images">
+                        <div class="queue-image">
+                            <img src="circularqueues1.png" alt="Circular Queue Structure">
+                        </div>
+                        <div class="queue-image">
+                            <img src="Circularqueue2.png" alt="Circular Queue Operations">
+                        </div>
+                    </div>
+                    <h3>Circular Queue</h3>
+                    <p>A queue where the last element is connected to the first element, forming a circle. This helps in efficient memory utilization and prevents overflow.</p>
+                </div>
+                <div class="queue-type">
+                    <div class="queue-image">
+                        <img src="Priority.png" alt="Priority Queue Structure">
+                    </div>
+                    <h3>Priority Queue</h3>
+                    <p>A special queue where elements are served based on their priority rather than their order of arrival. Higher priority elements are served first.</p>
+                </div>
+                <div class="queue-type">
+                    <div class="queue-image">
+                        <img src="doublequeue.JPG" alt="Double Ended Queue Structure">
+            </div>
+                    <h3>Double Ended Queue (Deque)</h3>
+                    <p>A queue that allows insertion and deletion from both ends. It combines the features of both stack and queue data structures.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="characteristics animate-slide-up">
+            <h2>Key Characteristics of Queues</h2>
+            <ul>
+                <li>FIFO Principle: First element added is the first to be removed</li>
+                <li>Two Main Operations: Enqueue (add) and Dequeue (remove)</li>
+                <li>Fixed Size: Can be implemented with a fixed or dynamic size</li>
+                <li>Efficient Operations: Both enqueue and dequeue operations are O(1)</li>
+                <li>No Random Access: Can only access elements at the front</li>
+                <li>Common Applications: Task scheduling, printer queues, message processing</li>
+            </ul>
+        </div>
+
+        <div class="complexity animate-slide-up">
+            <h2>Time Complexity</h2>
+            <ul>
+                <li>Enqueue: O(1) - Constant time operation</li>
+                <li>Dequeue: O(1) - Constant time operation</li>
+                <li>Front: O(1) - Constant time operation</li>
+                <li>Search: O(n) - Must traverse through elements</li>
+                <li>IsEmpty: O(1) - Constant time operation</li>
+                <li>Size: O(1) - Constant time operation</li>
+            </ul>
+        </div>
+
+        <div class="applications animate-slide-up">
+            <h2>Applications of Queues</h2>
+            <ul>
+                <li>Task Scheduling in Operating Systems</li>
+                <li>Printer Queue Management</li>
+                <li>Message Processing Systems</li>
+                <li>Breadth-First Search in Graphs</li>
+                <li>Call Center Systems</li>
+                <li>Network Packet Processing</li>
+            </ul>
+        </div>
+
+        <div class="pseudocode animate-slide-up">
+            <h2>Queue Operations Pseudocode</h2>
+            
+            <div class="pseudocode-section">
+                <h3>Simple Queue</h3>
+                <pre>
+class SimpleQueue:
+    def __init__(self, size):
+        self.size = size
+        self.queue = [None] * size
+        self.front = self.rear = -1
+
+    def enqueue(self, item):
+        if self.is_full():
+            return "Queue is full"
+        if self.is_empty():
+            self.front = self.rear = 0
+        else:
+            self.rear = (self.rear + 1) % self.size
+        self.queue[self.rear] = item
+
+    def dequeue(self):
+        if self.is_empty():
+            return "Queue is empty"
+        item = self.queue[self.front]
+        if self.front == self.rear:
+            self.front = self.rear = -1
+        else:
+            self.front = (self.front + 1) % self.size
+        return item
+
+    def is_empty(self):
+        return self.front == -1
+
+    def is_full(self):
+        return (self.rear + 1) % self.size == self.front
+                </pre>
+            </div>
+
+            <div class="pseudocode-section">
+                <h3>Circular Queue</h3>
+                <pre>
+class CircularQueue:
+    def __init__(self, size):
+        self.size = size
+        self.queue = [None] * size
+        self.front = self.rear = -1
+
+    def enqueue(self, item):
+        if self.is_full():
+            return "Queue is full"
+        if self.is_empty():
+            self.front = self.rear = 0
+        else:
+            self.rear = (self.rear + 1) % self.size
+        self.queue[self.rear] = item
+
+    def dequeue(self):
+        if self.is_empty():
+            return "Queue is empty"
+        item = self.queue[self.front]
+        if self.front == self.rear:
+            self.front = self.rear = -1
+        else:
+            self.front = (self.front + 1) % self.size
+        return item
+
+    def is_empty(self):
+        return self.front == -1
+
+    def is_full(self):
+        return (self.rear + 1) % self.size == self.front
+                </pre>
+            </div>
+
+            <div class="pseudocode-section">
+                <h3>Priority Queue</h3>
+                <pre>
+class PriorityQueue:
+    def __init__(self):
+        self.queue = []
+
+    def enqueue(self, item, priority):
+        self.queue.append((item, priority))
+        self.queue.sort(key=lambda x: x[1])
+
+    def dequeue(self):
+        if self.is_empty():
+            return "Queue is empty"
+        return self.queue.pop(0)[0]
+
+    def peek(self):
+        if self.is_empty():
+            return "Queue is empty"
+        return self.queue[0][0]
+
+    def is_empty(self):
+        return len(self.queue) == 0
+
+    def update_priority(self, item, new_priority):
+        for i, (x, p) in enumerate(self.queue):
+            if x == item:
+                self.queue[i] = (item, new_priority)
+                self.queue.sort(key=lambda x: x[1])
+                return True
+        return False
+                </pre>
+            </div>
+
+            <div class="pseudocode-section">
+                <h3>Double Ended Queue (Deque)</h3>
+                <pre>
+class Deque:
+    def __init__(self):
+        self.items = []
+
+    def add_front(self, item):
+        self.items.insert(0, item)
+
+    def add_rear(self, item):
+        self.items.append(item)
+
+    def remove_front(self):
+        if self.is_empty():
+            return "Deque is empty"
+        return self.items.pop(0)
+
+    def remove_rear(self):
+        if self.is_empty():
+            return "Deque is empty"
+        return self.items.pop()
+
+    def peek_front(self):
+        if self.is_empty():
+            return "Deque is empty"
+        return self.items[0]
+
+    def peek_rear(self):
+        if self.is_empty():
+            return "Deque is empty"
+        return self.items[-1]
+
+    def is_empty(self):
+        return len(self.items) == 0
+
+    def size(self):
+        return len(self.items)
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

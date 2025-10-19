@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Quiz - Easy Level</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 700px;
+            width: 95vw;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: #2d6a4f;
+            text-align: center;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .options {
+            margin-bottom: 1.2rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+            padding: 0.8rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 12px;
+            border: 2px solid #e3f6e5;
+            background: #f6fffa;
+            color: #217a36;
+            font-weight: 500;
+            text-align: left;
+            transition: background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .option-btn.selected {
+            background: #cbe9d7;
+            border: 2px solid #88d8b0;
+            color: #145c2c;
+        }
+        .option-btn.correct {
+            background: #a8e6cf;
+            border: 2px solid #2ecc40;
+            color: #217a36;
+        }
+        .option-btn.incorrect {
+            background: #ffb3b3;
+            border: 2px solid #ff8b8b;
+            color: #b91c1c;
+        }
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .next-btn, .restart-btn {
+            display: inline-block;
+            padding: 0.7rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .next-btn:hover, .restart-btn:hover {
+            background: linear-gradient(90deg, #cbe9d7 0%, #e3f6e5 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .final-score, .next-level-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #217a36;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .next-level-container {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s, transform 0.7s;
+            margin-top: 2.5rem;
+        }
+        .next-level-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .next-level-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 16px rgba(139, 115, 85, 0.08);
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInBtn 1s 0.7s forwards;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 id="quizTitle">Stack Quiz - Easy Level</h1>
+        <div id="quiz"></div>
+    </div>
+    <script>
+    const easyQuestions = [
+        {
+            q: "What is a stack?",
+            options: ["FIFO structure","LIFO structure","LILO structure","FILO structure"],
+            answer: 1
+        },
+        {
+            q: "Which of the following operations are basic stack operations?",
+            options: ["Insert and Delete","Push and Pop","Enqueue and Dequeue","Add and Remove"],
+            answer: 1
+        },
+        {
+            q: "What does LIFO stand for?",
+            options: ["Last In First Out","Last In First Off","First In First Out","First In First Off"],
+            answer: 0
+        },
+        {
+            q: "Which function adds an element to the stack?",
+            options: ["pop()","insert()","push()","append()"],
+            answer: 2
+        },
+        {
+            q: "Which function removes the top element from the stack?",
+            options: ["delete()","remove()","pop()","clear()"],
+            answer: 2
+        },
+        {
+            q: "What happens when a stack overflows?",
+            options: ["Data gets duplicated","Stack resets","Error occurs due to excessive elements","Old data is deleted"],
+            answer: 2
+        },
+        {
+            q: "Which data structure is used in function call management in programming?",
+            options: ["Queue","Linked List","Stack","Tree"],
+            answer: 2
+        },
+        {
+            q: "What is the maximum number of elements a stack can hold if its size is 5?",
+            options: ["6","5","4","Infinite"],
+            answer: 1
+        },
+        {
+            q: "Which of the following is NOT a stack application?",
+            options: ["Expression evaluation","Undo feature in editors","Page replacement algorithms","Function call management"],
+            answer: 2
+        },
+        {
+            q: "Stack is best implemented using:",
+            options: ["Arrays or Linked List","Trees","Graphs","Hash Tables"],
+            answer: 0
+        }
+    ];
+
+    const mediumQuestions = [
+        {
+            q: "Which condition indicates a full stack using an array implementation (size = n)?",
+            options: ["top == n","top == n - 1","top == 0","top == -1"],
+            answer: 1
+        },
+        {
+            q: "Which of the following postfix expressions is equivalent to infix: A + B * C?",
+            options: ["ABC+*","ABC*C*","ABC*+","A+BC*"],
+            answer: 2
+        },
+        {
+            q: "What is the time complexity of the push() operation in a stack implemented by a linked list?",
+            options: ["O(1)","O(n)","O(log n)","O(n log n)"],
+            answer: 0
+        },
+        {
+            q: "Which operation can be used to check whether the stack is empty?",
+            options: ["isempty()","top == -1","size == 0","All of the above"],
+            answer: 3
+        },
+        {
+            q: "In a stack implemented using a linked list, where does the push operation occur?",
+            options: ["End","Front","Middle","None"],
+            answer: 1
+        },
+        {
+            q: "Which of the following converts infix to postfix expression correctly?",
+            options: ["Stack","Queue","Tree","Array"],
+            answer: 0
+        },
+        {
+            q: "Which of the following is an invalid postfix expression?",
+            options: ["AB+","AB*C*","ABC+","AB+C+"],
+            answer: 2
+        },
+        {
+            q: "What is the output of popping all elements from a stack containing [5, 3, 8]?",
+            options: ["5, 3, 8","8, 3, 5","3, 5, 8","5, 8, 3"],
+            answer: 1
+        },
+        {
+            q: "Which of the following is NOT true for a stack?",
+            options: ["Top points to the last inserted element","Stack allows random access","Stack can be implemented using arrays","Stack can be implemented using linked list"],
+            answer: 1
+        },
+        {
+            q: "Which application typically uses a stack structure?",
+            options: ["Printing documents","CPU scheduling","Recursive function calls","BFS traversal"],
+            answer: 2
+        }
+    ];
+
+    const hardQuestions = [
+        {
+            q: "Which of the following postfix expressions evaluates to 6?",
+            options: ["23 1+*","62/3+","53*21/+","42+12/+"],
+            answer: 2
+        },
+        {
+            q: "In converting infix (A+B)*C to postfix, what will be the result?",
+            options: ["A+B*C","AB+C*","ABC*+","AB+*C"],
+            answer: 1
+        },
+        {
+            q: "Which of the following correctly represents the order of operations in stack for evaluating an expression?",
+            options: ["Infix → Prefix → Evaluate","Postfix → Infix → Evaluate","Infix → Postfix → Evaluate","Prefix → Postfix → Evaluate"],
+            answer: 2
+        },
+        {
+            q: "What is the maximum depth of recursion possible before stack overflow depends on?",
+            options: ["Number of variables","Stack size","CPU speed","Type of data"],
+            answer: 1
+        },
+        {
+            q: "Which of the following operations is not constant time in a dynamic stack?",
+            options: ["push()","pop()","peek()","resizing"],
+            answer: 3
+        },
+        {
+            q: "In stack implementation of function calls, each function call is stored as:",
+            options: ["Node","Frame","Object","Queue"],
+            answer: 1
+        },
+        {
+            q: "Which data structure is used in undo operations of text editors?",
+            options: ["Stack","Queue","Hash table","Tree"],
+            answer: 0
+        },
+        {
+            q: "Given an empty stack, what is the result of evaluating: push(1), push(2), pop(), push(3), pop()?",
+            options: ["2","3","1","4"],
+            answer: 2
+        },
+        {
+            q: "What is the auxiliary space complexity of a stack-based recursive function?",
+            options: ["O(1)","O(log n)","O(n)","O(n^2)"],
+            answer: 2
+        },
+        {
+            q: "Which algorithm uses stack for its internal working?",
+            options: ["Bubble Sort","Inorder Tree Traversal","BFS","Merge Sort"],
+            answer: 1
+        }
+    ];
+
+    let questions = easyQuestions;
+    let current = 0;
+    let score = 0;
+    let answered = false;
+    let level = 'easy';
+
+    function renderQuestion() {
+        const q = questions[current];
+        let html = `<div class='score'>Score: ${score} / ${questions.length}</div>`;
+        html += `<div class='question'>Q${current+1}. ${q.q}</div><div class='options'>`;
+        q.options.forEach((opt, idx) => {
+            html += `<button class='option-btn' onclick='selectOption(${idx})' id='opt${idx}'>${String.fromCharCode(65+idx)}) ${opt}</button>`;
+        });
+        html += `</div><div id='feedback' class='feedback'></div>`;
+        if(current < questions.length-1) {
+            html += `<button class='next-btn' id='nextBtn' style='display:none' onclick='nextQuestion()'>Next</button>`;
+        } else {
+            if(level === 'easy') {
+                html += `<button class='next-btn' id='nextBtn' style='display:none' onclick='showEasyLevelComplete()'>Finish Easy Level</button>`;
+            } else if(level === 'medium') {
+                html += `<button class='next-btn' id='nextBtn' style='display:none' onclick='showMediumLevelComplete()'>Finish Medium Level</button>`;
+            } else {
+                html += `<button class='next-btn' id='nextBtn' style='display:none' onclick='showFinalScore()'>Finish</button>`;
+            }
+        }
+        document.getElementById('quiz').innerHTML = html;
+        answered = false;
+    }
+
+    window.selectOption = function(idx) {
+        if(answered) return;
+        answered = true;
+        const q = questions[current];
+        const correct = q.answer === idx;
+        if(correct) {
+            document.getElementById('opt'+idx).classList.add('correct');
+            document.getElementById('feedback').innerHTML = 'Correct!';
+            score++;
+        } else {
+            document.getElementById('opt'+idx).classList.add('incorrect');
+            document.getElementById('opt'+q.answer).classList.add('correct');
+            document.getElementById('feedback').innerHTML = 'Incorrect!';
+        }
+        document.getElementById('nextBtn').style.display = 'inline-block';
+    }
+
+    window.nextQuestion = function() {
+        current++;
+        renderQuestion();
+    }
+
+    window.showNextLevel = function() {
+        level = 'medium';
+        questions = mediumQuestions;
+        current = 0;
+        score = 0;
+        document.getElementById('quizTitle').textContent = 'Stack Quiz - Medium Level';
+        renderQuestion();
+    }
+
+    window.showFinalScore = function() {
+        document.getElementById('quiz').innerHTML = `<div class='final-score'>Quiz Complete!<br>Your Score: ${score} / ${questions.length}</div><button class='restart-btn' onclick='restartQuiz()'>Restart</button>`;
+    }
+
+    window.showEasyLevelComplete = function() {
+        let html = `<div class='final-score'>Easy Level Complete!<br>Your Score: ${score} / ${easyQuestions.length}</div>`;
+        if (score >= 7) {
+            html += `<div class='next-level-container' id='nextLevelContainer'>
+                <button class='next-level-btn' onclick='showNextLevel()'>Next Level &rarr;</button>
+            </div>`;
+        } else {
+            html += `<div class='next-level-container show' id='nextLevelContainer'>
+                <div style='color:#b91c1c; font-size:1.1rem; margin-bottom:1.2rem;'>You need at least 7/10 to unlock the Medium Level.<br>Try again!</div>
+                <button class='restart-btn' onclick='restartQuiz()'>Retry Easy Level</button>
+            </div>`;
+        }
+        document.getElementById('quiz').innerHTML = html;
+        if (score >= 7) {
+            setTimeout(() => {
+                document.getElementById('nextLevelContainer').classList.add('show');
+            }, 100);
+        }
+    }
+
+    window.showMediumLevelComplete = function() {
+        let html = `<div class='final-score'>Medium Level Complete!<br>Your Score: ${score} / ${mediumQuestions.length}</div>`;
+        if (score >= 7) {
+            html += `<div class='next-level-container' id='nextLevelContainer'>
+                <button class='next-level-btn' onclick='showHardLevel()'>Hard Level &rarr;</button>
+            </div>`;
+        } else {
+            html += `<div class='next-level-container show' id='nextLevelContainer'>
+                <div style='color:#b91c1c; font-size:1.1rem; margin-bottom:1.2rem;'>You need at least 7/10 to unlock the Hard Level.<br>Try again!</div>
+                <button class='restart-btn' onclick='restartQuiz()'>Retry Medium Level</button>
+            </div>`;
+        }
+        document.getElementById('quiz').innerHTML = html;
+        if (score >= 7) {
+            setTimeout(() => {
+                document.getElementById('nextLevelContainer').classList.add('show');
+            }, 100);
+        }
+    }
+
+    window.showHardLevel = function() {
+        level = 'hard';
+        questions = hardQuestions;
+        current = 0;
+        score = 0;
+        document.getElementById('quizTitle').textContent = 'Stack Quiz - Hard Level';
+        renderQuestion();
+    }
+
+    window.restartQuiz = function() {
+        level = 'easy';
+        questions = easyQuestions;
+        current = 0;
+        score = 0;
+        document.getElementById('quizTitle').textContent = 'Stack Quiz - Easy Level';
+        renderQuestion();
+    }
+
+    renderQuestion();
+    </script>
+</body>
+</html> 

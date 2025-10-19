@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Game - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FFE5B4;    /* Soft Peach */
+            --secondary-color: #FFF4BD;   /* Pastel Yellow */
+            --tertiary-color: #FFF9C4;    /* Light Pastel Yellow */
+            --quaternary-color: #FFFDE7;  /* Very Light Yellow */
+            --text-color: #8B7355;        /* Warm Brown */
+            --background-color: #FFF8DC;  /* Cream */
+            --light-purple: #FFF9C4;      /* Light Pastel Yellow */
+            --dark-purple: #FFD700;       /* Golden Yellow */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .game-container {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(139, 115, 85, 0.1);
+        }
+
+        .stack-container {
+            width: 200px;
+            height: 400px;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(139, 115, 85, 0.1);
+            margin-bottom: 8px;
+        }
+
+        .stack-element {
+            width: 180px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 8px;
+            margin: 5px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 10px;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
+        }
+
+        /* New animation styles */
+        @keyframes pushAnimation {
+            0% {
+                transform: translateY(-100px) scale(1.2);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(-50px) scale(1.1);
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes popAnimation {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes burstParticle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .stack-element.pushing {
+            animation: pushAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .stack-element.popping {
+            animation: popAnimation 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+        }
+
+        .burst-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .element-input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            margin-right: 1rem;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .element-input::placeholder {
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .game-controls .element-input {
+            width: 120px;
+        }
+
+        .game-controls .btn-primary {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--tertiary-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 115, 85, 0.2);
+        }
+
+        .score-board {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            color: var(--text-color);
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.1);
+        }
+
+        .level-indicator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.1);
+        }
+
+        .game-message {
+            padding: 12px;
+            border-radius: 15px;
+            margin: 15px 0;
+            text-align: center;
+            min-height: 24px;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            display: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            transform: translateY(-20px);
+            opacity: 0;
+            box-shadow: 0 2px 8px rgba(139, 115, 85, 0.1);
+        }
+        .game-message.success,
+        .game-message.error {
+            display: block;
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .game-message.success {
+            background: linear-gradient(120deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            border: none;
+            box-shadow: none;
+        }
+        .game-message.error {
+            background: linear-gradient(135deg, #ffb3b3, #ff8b8b);
+            color: #b91c1c;
+            border: 2px solid #ff8b8b;
+        }
+
+        .tutorial {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(139, 115, 85, 0.1);
+        }
+
+        .tutorial h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tutorial ol {
+            padding-left: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .tutorial li {
+            margin: 0.5rem 0;
+        }
+
+        .level-objectives {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.1);
+        }
+
+        .level-objectives h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .level-objectives p {
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 5px rgba(139, 115, 85, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: var(--dark-purple);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        h2 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+        }
+
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sound-control:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-control i {
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .sound-control.muted i::before {
+            content: "\f6a9";  /* Font Awesome mute icon */
+        }
+
+        .sound-control:not(.muted) i::before {
+            content: "\f028";  /* Font Awesome volume-up icon */
+        }
+
+        /* Update peek animation styles */
+        @keyframes peekAnimation {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 8px 16px rgba(139, 115, 85, 0.4);
+                background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 2px 4px rgba(139, 115, 85, 0.2);
+            }
+        }
+
+        .stack-element.peeked {
+            animation: peekAnimation 1s ease-in-out;
+            z-index: 10;
+        }
+
+        /* Add styles for peek overlay */
+        .peek-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .peek-overlay.visible {
+            opacity: 1;
+        }
+
+        .peek-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .peek-overlay.visible .peek-content {
+            transform: scale(1);
+        }
+
+        .peek-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        /* Add styles for size input warning */
+        .size-warning {
+            color: #C62828;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .size-warning.visible {
+            display: block;
+        }
+
+        /* Update stack size input styles */
+        .stack-size-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stack-size-input .element-input {
+            width: 120px;
+        }
+
+        #setSizeBtn {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+        }
+
+        .info-section {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .info-section h3 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .info-section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .info-section li {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 249, 196, 0.7); /* pastel light yellow */
+            border-radius: 5px;
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .objective-panel {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.1);
+        }
+
+        .objective-panel h3 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .objective-text {
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .objective-complete-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 100;
+            min-height: 48px;
+        }
+        .objective-complete-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stack-message-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .objective-complete-message, .game-message {
+            min-height: 24px;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .stack-info {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .stack-operations h4, .stack-properties h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .stack-operations ul, .stack-properties ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .stack-operations li, .stack-properties li {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 5px;
+            text-align: left;
+            padding-left: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn" title="Back to Games">←</a>
+    <div class="detail-page visible">
+        <div class="container">
+            <button class="sound-control" id="soundControl" title="Toggle Sound">
+                <i class="fas fa-volume-up"></i>
+            </button>
+            <div class="game-container">
+                <h1 class="text-center">Stack Game</h1>
+                <div class="level-objectives">
+                    <h4>🎯 Current Objective:</h4>
+                    <div class="objective">
+                        <p class="objective-text" id="currentObjective" style="font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">
+                            Push the first item onto the stack.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="stack-container" id="stackContainer">
+                    <!-- Stack elements will be added here dynamically -->
+                </div>
+                <div id="gameMessage" class="game-message"></div>
+
+                <div class="stack-size-input">
+                    <input type="number" id="stackSizeInput" class="element-input" placeholder="Enter stack size" min="1" max="9" value="5">
+                    <button class="btn btn-primary" id="setSizeBtn">Set Size</button>
+                    <div class="size-warning" id="sizeWarning">Please enter a size between 1 and 9</div>
+                </div>
+
+                <div class="game-controls">
+                    <input type="text" class="element-input" id="elementInput" placeholder="Enter value" maxlength="4">
+                    <button class="btn btn-primary" id="pushBtn">Push</button>
+                    <button class="btn btn-primary" id="popBtn">Pop</button>
+                    <button class="btn btn-primary" id="peekBtn">Peek</button>
+                </div>
+
+                <div class="tutorial">
+                    <h4>How to Play:</h4>
+                    <ol>
+                        <li>First, set your desired stack size</li>
+                        <li>Enter a number in the input field</li>
+                        <li>Use Push to add the number to the stack</li>
+                        <li>Use Pop to remove the top element</li>
+                        <li>Use Peek to see the top element without removing it</li>
+                        <li>Complete the current objective to win!</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Stack Operations</h3>
+                <ul>
+                    <li>Push: Adds an element to the top of the stack</li>
+                    <li>Pop: Removes the top element from the stack</li>
+                    <li>Peek: Views the top element without removing it</li>
+                </ul>
+
+                <h3>Stack Properties</h3>
+                <ul>
+                    <li>LIFO (Last In First Out) structure</li>
+                    <li>Only the top element is accessible</li>
+                    <li>Operations are performed at one end only</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sound effect system
+        class SoundEffect {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.isMuted = false;
+                this.volume = 0.1;
+            }
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                return this.isMuted;
+            }
+
+            playSound(frequency, duration, type = 'sine') {
+                if (this.isMuted) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+                
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+
+            playPushSound() {
+                this.playSound(440, 0.3);
+            }
+
+            playPopSound() {
+                this.playSound(330, 0.2);
+            }
+
+            playPeekSound() {
+                this.playSound(523.25, 0.15);
+            }
+
+            playErrorSound() {
+                this.playSound(220, 0.2, 'square');
+            }
+
+            playSuccessSound() {
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((note, index) => {
+                    setTimeout(() => {
+                        this.playSound(note, 0.1);
+                    }, index * 100);
+                });
+            }
+        }
+
+        class StackGame {
+            constructor() {
+                this.stack = [];
+                this.maxStackSize = 5;
+                this.soundEffect = new SoundEffect();
+                this.usedObjectives = new Set();
+                this.popCount = 0;
+                this.objectives = [
+                    {
+                        task: "Push {size} elements to the stack",
+                        check: (stack) => stack.length === this.maxStackSize,
+                        message: "Great job! You've filled the stack."
+                    },
+                    {
+                        task: "Pop {size/2} elements from the stack",
+                        check: (stack) => this.popCount >= Math.floor(this.maxStackSize / 2),
+                        message: "Excellent! You've popped the required elements."
+                    }
+                ];
+                this.currentObjectiveIndex = 0;
+                this.initializeGame();
+            }
+
+            initializeGame() {
+                this.stack = [];
+                this.popCount = 0;
+                this.updateDisplay();
+                this.setObjective(this.currentObjectiveIndex);
+            }
+
+            setStackSize(size) {
+                if (size >= 1 && size <= 9) {
+                    this.maxStackSize = size;
+                    this.initializeGame();
+                    this.showMessage(`Stack size set to ${size}`, "success");
+                    document.getElementById('sizeWarning').classList.remove('visible');
+                    document.getElementById('stackContainer').style.display = 'block';
+                    return true;
+                }
+                document.getElementById('sizeWarning').classList.add('visible');
+                this.showMessage("Please enter a size between 1 and 9", "error");
+                return false;
+            }
+
+            push(value) {
+                if (!value || value.trim() === '') {
+                    this.showMessage("Please enter a value!", "error");
+                    this.soundEffect.playErrorSound();
+                    return false;
+                }
+
+                if (value.length > 4) {
+                    this.showMessage("Value is too long! Maximum 4 digits allowed.", "error");
+                    this.soundEffect.playErrorSound();
+                    return false;
+                }
+
+                if (!/^\d{1,4}$/.test(value)) {
+                    this.showMessage("Please enter only digits (0-9)!", "error");
+                    this.soundEffect.playErrorSound();
+                    return false;
+                }
+
+                if (this.stack.length >= this.maxStackSize) {
+                    this.showMessage("Stack is full!", "error");
+                    this.soundEffect.playErrorSound();
+                    return false;
+                }
+
+                this.stack.push(value);
+                this.updateDisplay();
+                this.soundEffect.playPushSound();
+                this.checkObjectiveCompletion();
+                return true;
+            }
+
+            pop() {
+                if (this.stack.length === 0) {
+                    this.showMessage("Stack is empty!", "error");
+                    this.soundEffect.playErrorSound();
+                    return null;
+                }
+
+                const container = document.getElementById('stackContainer');
+                const topElement = container.lastElementChild;
+                if (topElement) {
+                    const rect = topElement.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    const x = rect.left - containerRect.left + rect.width / 2;
+                    const y = rect.top - containerRect.top + rect.height / 2;
+
+                    topElement.classList.add('popping');
+                    
+                    setTimeout(() => {
+                        this.createBurstEffect(x, y);
+                    }, 150);
+
+                    setTimeout(() => {
+                        this.stack.pop();
+                        this.popCount++;
+                        this.updateDisplay();
+                        this.soundEffect.playPopSound();
+                        this.checkObjectiveCompletion();
+                    }, 300);
+                }
+                return this.stack[this.stack.length - 1];
+            }
+
+            peek() {
+                if (this.stack.length === 0) {
+                    this.showMessage("Stack is empty!", "error");
+                    this.soundEffect.playErrorSound();
+                    return null;
+                }
+                
+                const topElement = this.stack[this.stack.length - 1];
+                this.soundEffect.playPeekSound();
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'peek-overlay';
+                
+                const content = document.createElement('div');
+                content.className = 'peek-content';
+                
+                const value = document.createElement('div');
+                value.className = 'peek-value';
+                value.textContent = topElement;
+                
+                content.appendChild(value);
+                overlay.appendChild(content);
+                document.body.appendChild(overlay);
+                
+                setTimeout(() => {
+                    overlay.classList.add('visible');
+                }, 10);
+                
+                setTimeout(() => {
+                    overlay.classList.remove('visible');
+                    setTimeout(() => {
+                        overlay.remove();
+                    }, 300);
+                }, 1000);
+                
+                return topElement;
+            }
+
+            updateDisplay() {
+                const container = document.getElementById('stackContainer');
+                container.innerHTML = '';
+                
+                const elementHeight = Math.min(60, 400 / this.maxStackSize);
+                const spacing = Math.min(70, 400 / this.maxStackSize);
+                
+                this.stack.forEach((value, index) => {
+                    const element = document.createElement('div');
+                    element.className = 'stack-element';
+                    element.style.height = `${elementHeight}px`;
+                    element.style.bottom = `${index * spacing}px`;
+                    element.textContent = value;
+                    
+                    if (index === this.stack.length - 1) {
+                        element.classList.add('pushing');
+                    }
+                    
+                    container.appendChild(element);
+                });
+            }
+
+            showMessage(message, type) {
+                const messageElement = document.getElementById('gameMessage');
+                messageElement.textContent = message;
+                messageElement.className = `game-message ${type}`;
+                messageElement.style.display = 'block';
+                setTimeout(() => {
+                    messageElement.style.display = 'none';
+                    messageElement.className = 'game-message';
+                }, 2000);
+            }
+
+            setObjective(index) {
+                let objective = this.objectives[index];
+                let task = objective.task;
+                task = task.replace('{size}', this.maxStackSize);
+                task = task.replace('{size/2}', Math.floor(this.maxStackSize / 2));
+                document.getElementById('currentObjective').textContent = task;
+            }
+
+            checkObjectiveCompletion() {
+                const currentObjective = this.objectives[this.currentObjectiveIndex];
+                if (currentObjective.check(this.stack)) {
+                    this.completeObjective();
+                }
+            }
+
+            completeObjective() {
+                const isLast = this.usedObjectives.size >= this.objectives.length;
+                if (!isLast) {
+                    const nextIndex = (this.currentObjectiveIndex + 1) % this.objectives.length;
+                    let nextObjective = this.objectives[nextIndex];
+                    this.showMessage(`Objective completed! Moving to next objective: ${nextObjective.task}`, "success");
+                    this.currentObjectiveIndex = nextIndex;
+                    setTimeout(() => {
+                        this.setObjective(this.currentObjectiveIndex);
+                    }, 2500);
+                } else {
+                    this.showMessage('Congratulations! You have completed all objectives!', "success");
+                }
+            }
+
+            createBurstEffect(x, y) {
+                const container = document.getElementById('stackContainer');
+                const particleCount = 12;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'burst-particle';
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const distance = 50 + Math.random() * 50;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    particle.style.setProperty('--tx', `${tx}px`);
+                    particle.style.setProperty('--ty', `${ty}px`);
+                    particle.style.animation = `burstParticle 0.5s ease-out forwards`;
+                    
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 500);
+                }
+            }
+        }
+
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const game = new StackGame();
+            
+            // Sound control button
+            const soundControl = document.getElementById('soundControl');
+            soundControl.addEventListener('click', () => {
+                const isMuted = game.soundEffect.toggleMute();
+                soundControl.classList.toggle('muted', isMuted);
+            });
+            
+            // Set size button
+            document.getElementById('setSizeBtn').addEventListener('click', () => {
+                const size = parseInt(document.getElementById('stackSizeInput').value);
+                game.setStackSize(size);
+            });
+
+            // Push button
+            document.getElementById('pushBtn').addEventListener('click', () => {
+                const inputElement = document.getElementById('elementInput');
+                const value = inputElement.value.trim();
+                if (value) {
+                    if (game.push(value)) {
+                        inputElement.value = '';
+                        inputElement.focus();
+                    }
+                }
+            });
+
+            // Pop button
+            document.getElementById('popBtn').addEventListener('click', () => {
+                game.pop();
+            });
+
+            // Peek button
+            document.getElementById('peekBtn').addEventListener('click', () => {
+                game.peek();
+            });
+
+            // Enter key for push
+            document.getElementById('elementInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const inputElement = e.target;
+                    const value = inputElement.value.trim();
+                    if (value) {
+                        if (game.push(value)) {
+                            inputElement.value = '';
+                            inputElement.focus();
+                        }
+                    }
+                }
+            });
+
+            // Size input validation
+            document.getElementById('stackSizeInput').addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                if (value > 9) {
+                    e.target.value = 9;
+                } else if (value < 1) {
+                    e.target.value = 1;
+                }
+            });
+
+            // Initialize with default size of 5
+            game.setStackSize(5);
+            document.getElementById('stackSizeInput').value = '5';
+        });
+    </script>
+</body>
+</html> 

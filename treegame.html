@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Game - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #98df98;    /* Pale Green */
+            --secondary-color: #ade9ad;   /* Light Green */
+            --tertiary-color: #98FF98;    /* Mint Green */
+            --quaternary-color: #E0FFF0;   /* Honeydew */
+            --text-color: #1f7243;        /* Sea Green */
+            --background-color: #F0FFF0;   /* Honeydew */
+            --light-purple: #F0E6FF;
+            --dark-purple: #330066;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: Arial, sans-serif;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .tree-container {
+            width: 1200px;
+            height: 800px;
+            margin: 2rem auto;
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 4px 6px rgba(46, 139, 87, 0.1);
+            border: 2px solid var(--primary-color);
+            overflow: auto;
+        }
+
+        .node {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 4px rgba(46, 139, 87, 0.2);
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(46, 139, 87, 0.3);
+        }
+
+        .node.selected {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            border: 2px solid var(--text-color);
+        }
+
+        .edge {
+            position: absolute;
+            background-color: var(--text-color);
+            height: 2px;
+            transform-origin: left center;
+            pointer-events: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-tree {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-tree:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+        }
+
+        .input-tree {
+            width: 120px;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            text-align: center;
+            color: var(--text-color);
+            background-color: white;
+        }
+
+        .input-tree:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(144, 238, 144, 0.2);
+        }
+
+        .game-message {
+            text-align: center;
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-color);
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(46, 139, 87, 0.1);
+            border: 2px solid var(--primary-color);
+        }
+
+        .instructions h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .instructions ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+            color: var(--text-color);
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .traversal-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .traversal-btn {
+            background: linear-gradient(135deg, var(--secondary-color), var(--tertiary-color));
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .traversal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 139, 87, 0.2);
+        }
+
+        .traversal-result {
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .node-info {
+            position: absolute;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid var(--primary-color);
+            display: none;
+            z-index: 1000;
+        }
+
+        .level-objectives {
+            background-color: var(--primary-color);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .level-objectives h4 {
+            color: var(--dark-purple);
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .level-objectives p {
+            font-size: 1.4rem;
+            color: var(--dark-purple);
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .scrollable-content {
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn">←</a>
+
+    <div class="container">
+        <h1 class="text-center my-4">Tree Game</h1>
+
+        <div class="level-objectives">
+            <h4>Current Objective:</h4>
+            <div class="objective">
+                <p class="objective-text" id="currentObjective" style="font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">
+                    🎯 Current Objective: Add the root node to start your tree.
+                </p>
+            </div>
+        </div>
+
+        <div class="game-message" id="gameMessage"></div>
+
+        <div class="scrollable-content">
+            <div class="controls">
+                <input type="text" class="input-tree" id="nodeValue" placeholder="Value(max 5)">
+                <button class="btn-tree" onclick="addNode()">Add Node</button>
+                <button class="btn-tree" onclick="deleteNode()">Delete Node</button>
+                <button class="btn-tree" onclick="clearTree()">Clear Tree</button>
+            </div>
+
+            <div class="traversal-controls">
+                <button class="traversal-btn" onclick="traverseLevelOrder()">Level-order</button>
+            </div>
+
+            <div class="traversal-result" id="traversalResult"></div>
+
+            <div class="tree-container" id="treeContainer"></div>
+
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <ul>
+                    <li>Enter a value (max 5) in the input field and click "Add Node" to create a new node</li>
+                    <li>Each level can have a maximum of 8 nodes</li>
+                    <li>Each node can have up to 8 children</li>
+                    <li>Click on an existing node to select it as the parent for the new node</li>
+                    <li>Click "Delete Node" to remove the selected node and its subtree</li>
+                    <li>Use traversal buttons to see different ways of visiting nodes</li>
+                    <li>Hover over nodes to see node information</li>
+                    <li>Click "Clear Tree" to start over</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TreeNode {
+            constructor(value) {
+                this.value = value;
+                this.children = [];
+                this.x = 0;
+                this.y = 0;
+            }
+        }
+
+        let root = null;
+        let selectedNode = null;
+        let nodeCount = 0;
+
+        // Add tree objectives
+        const objectives = [
+            "Create a root node with any value",
+            "Add two child nodes to the root node",
+            "Create a tree with at least 3 levels",
+            "Create a tree with at least 5 nodes",
+            "Create a tree with at least 7 nodes",
+            "Delete a leaf node from your tree",
+            "Create a balanced tree with at least 7 nodes",
+            "Create a tree that represents a file system structure"
+        ];
+
+        let currentObjectiveIndex = 0;
+
+        function setRandomObjective() {
+            currentObjectiveIndex = Math.floor(Math.random() * objectives.length);
+            document.getElementById('currentObjective').textContent = objectives[currentObjectiveIndex];
+        }
+
+        function checkObjective() {
+            const objective = objectives[currentObjectiveIndex];
+            if (!root) return;
+
+            let completed = false;
+            switch(currentObjectiveIndex) {
+                case 0: // Root node
+                    completed = root !== null;
+                    break;
+                case 1: // Two child nodes
+                    completed = root && root.children.length >= 2;
+                    break;
+                case 2: // 3 levels
+                    completed = getTreeHeight(root) >= 3;
+                    break;
+                case 3: // 5 nodes
+                    completed = countNodes(root) >= 5;
+                    break;
+                case 4: // 7 nodes
+                    completed = countNodes(root) >= 7;
+                    break;
+                case 5: // Delete leaf node
+                    // This is checked when deleteNode is called
+                    break;
+                case 6: // Balanced tree with 7 nodes
+                    completed = countNodes(root) >= 7 && isBalanced(root);
+                    break;
+                case 7: // File system structure
+                    completed = countNodes(root) >= 3 && hasFileSystemStructure(root);
+                    break;
+            }
+
+            if (completed) {
+                showMessage("Objective completed! 🎉", "success");
+                setTimeout(() => {
+                    setRandomObjective();
+                }, 1500);
+            }
+        }
+
+        function getTreeHeight(node) {
+            if (!node) return 0;
+            let maxHeight = 0;
+            for (let child of node.children) {
+                maxHeight = Math.max(maxHeight, getTreeHeight(child));
+            }
+            return maxHeight + 1;
+        }
+
+        function isBalanced(node) {
+            if (!node) return true;
+            const heights = node.children.map(child => getTreeHeight(child));
+            const maxHeight = Math.max(...heights, 0);
+            const minHeight = Math.min(...heights, 0);
+            return maxHeight - minHeight <= 1 && node.children.every(isBalanced);
+        }
+
+        function hasFileSystemStructure(node) {
+            // Check if the tree resembles a file system (folders and files)
+            if (!node) return false;
+            const value = node.value.toLowerCase();
+            return value.includes('folder') || value.includes('file') || 
+                   value.includes('dir') || value.includes('.txt') || 
+                   value.includes('.doc') || value.includes('.pdf');
+        }
+
+        function addNode() {
+            const value = document.getElementById('nodeValue').value.trim();
+            
+            // Validate input length
+            if (value.length > 5) {
+                showMessage('Node value cannot be longer than 5 characters', 'error');
+                return;
+            }
+
+            if (!value) {
+                showMessage('Please enter a node value', 'error');
+                return;
+            }
+
+            const newNode = new TreeNode(value);
+
+            if (!root) {
+                root = newNode;
+                nodeCount++;
+                updateTreeVisualization();
+                showMessage('Root node added', 'success');
+            } else if (selectedNode) {
+                // Check number of nodes at the target level
+                const targetLevel = getNodeLevel(root, selectedNode) + 1;
+                const nodesAtLevel = countNodesAtLevel(root, targetLevel);
+                
+                if (nodesAtLevel >= 8) {
+                    showMessage(`Maximum of 8 nodes allowed at level ${targetLevel}`, 'error');
+                    return;
+                }
+
+                // Check if adding this node would make any level exceed 8 nodes
+                if (selectedNode.children.length >= 8) {
+                    showMessage('A node cannot have more than 8 children', 'error');
+                    return;
+                }
+
+                selectedNode.children.push(newNode);
+                nodeCount++;
+                updateTreeVisualization();
+                showMessage('Node added successfully', 'success');
+            } else {
+                showMessage('Please select a parent node first', 'error');
+                return;
+            }
+
+            document.getElementById('nodeValue').value = '';
+            checkObjective();
+        }
+
+        // Add new helper function to count nodes at a specific level
+        function countNodesAtLevel(node, targetLevel, currentLevel = 0) {
+            if (!node) return 0;
+            if (currentLevel === targetLevel) return 1;
+            
+            return node.children.reduce((count, child) => 
+                count + countNodesAtLevel(child, targetLevel, currentLevel + 1), 0);
+        }
+
+        function deleteNode() {
+            if (!selectedNode) {
+                showMessage('Please select a node to delete', 'error');
+                return;
+            }
+
+            const wasLeaf = selectedNode.children.length === 0;
+            
+            if (selectedNode === root) {
+                root = null;
+                nodeCount = 0;
+            } else {
+                const parent = findParent(root, selectedNode);
+                if (parent) {
+                    const index = parent.children.indexOf(selectedNode);
+                    parent.children.splice(index, 1);
+                    nodeCount = countNodes(root);
+                }
+            }
+
+            selectedNode = null;
+            updateTreeVisualization();
+            showMessage('Node deleted successfully', 'success');
+
+            if (wasLeaf && currentObjectiveIndex === 5) {
+                checkObjective();
+            }
+        }
+
+        function findParent(node, target) {
+            if (!node) return null;
+            for (let child of node.children) {
+                if (child === target) return node;
+                const parent = findParent(child, target);
+                if (parent) return parent;
+            }
+            return null;
+        }
+
+        function countNodes(node) {
+            if (!node) return 0;
+            let count = 1;
+            for (let child of node.children) {
+                count += countNodes(child);
+            }
+            return count;
+        }
+
+        function clearTree() {
+            root = null;
+            selectedNode = null;
+            nodeCount = 0;
+            updateTreeVisualization();
+            showMessage('Tree cleared', 'success');
+        }
+
+        function updateTreeVisualization() {
+            const container = document.getElementById('treeContainer');
+            container.innerHTML = '';
+
+            if (!root) return;
+
+            // Calculate positions
+            const levelHeight = 150;
+            const nodeWidth = 70;
+            calculatePositions(root, 0, 0, container.offsetWidth);
+
+            // Draw edges first
+            drawEdges(root, container);
+
+            // Then draw nodes
+            drawNodes(root, container);
+        }
+
+        function calculatePositions(node, level, left, right) {
+            node.y = level * 150 + 50;
+            
+            if (node.children.length === 0) {
+                node.x = (left + right) / 2;
+                return;
+            }
+
+            const width = right - left;
+            const childWidth = width / node.children.length;
+            const padding = childWidth * 0.2;
+            
+            node.children.forEach((child, index) => {
+                const childLeft = left + childWidth * index + padding;
+                const childRight = left + childWidth * (index + 1) - padding;
+                calculatePositions(child, level + 1, childLeft, childRight);
+            });
+
+            node.x = (node.children[0].x + node.children[node.children.length - 1].x) / 2;
+        }
+
+        function drawEdges(node, container) {
+            node.children.forEach(child => {
+                const edge = document.createElement('div');
+                edge.className = 'edge';
+                
+                const length = Math.sqrt(Math.pow(child.x - node.x, 2) + Math.pow(child.y - node.y, 2));
+                const angle = Math.atan2(child.y - node.y, child.x - node.x);
+                
+                edge.style.width = `${length}px`;
+                edge.style.left = `${node.x}px`;
+                edge.style.top = `${node.y}px`;
+                edge.style.transform = `rotate(${angle}rad)`;
+                
+                container.appendChild(edge);
+                drawEdges(child, container);
+            });
+        }
+
+        function drawNodes(node, container) {
+            const nodeElement = document.createElement('div');
+            nodeElement.className = 'node';
+            if (node === selectedNode) {
+                nodeElement.classList.add('selected');
+            }
+            nodeElement.textContent = node.value;
+            nodeElement.style.left = `${node.x - 35}px`;
+            nodeElement.style.top = `${node.y - 35}px`;
+            
+            nodeElement.onclick = () => selectNode(node);
+            nodeElement.onmouseover = (e) => showNodeInfo(e, node);
+            nodeElement.onmouseout = hideNodeInfo;
+            
+            container.appendChild(nodeElement);
+            
+            node.children.forEach(child => drawNodes(child, container));
+        }
+
+        function selectNode(node) {
+            selectedNode = node;
+            updateTreeVisualization();
+            showMessage(`Selected node: ${node.value}`, 'success');
+        }
+
+        function showNodeInfo(event, node) {
+            const info = document.createElement('div');
+            info.className = 'node-info';
+            info.innerHTML = `
+                Value: ${node.value}<br>
+                Children: ${node.children.length}<br>
+                Level: ${getNodeLevel(root, node)}
+            `;
+            info.style.left = `${event.pageX + 10}px`;
+            info.style.top = `${event.pageY + 10}px`;
+            document.body.appendChild(info);
+        }
+
+        function hideNodeInfo() {
+            const info = document.querySelector('.node-info');
+            if (info) info.remove();
+        }
+
+        function getNodeLevel(root, target, level = 0) {
+            if (!root) return -1;
+            if (root === target) return level;
+            for (let child of root.children) {
+                const childLevel = getNodeLevel(child, target, level + 1);
+                if (childLevel !== -1) return childLevel;
+            }
+            return -1;
+        }
+
+        function traverseLevelOrder() {
+            if (!root) {
+                showMessage('Tree is empty', 'error');
+                return;
+            }
+            const result = [];
+            const queue = [root];
+            
+            while (queue.length > 0) {
+                const node = queue.shift();
+                result.push(node.value);
+                queue.push(...node.children);
+            }
+            
+            document.getElementById('traversalResult').textContent = `Level-order: ${result.join(' → ')}`;
+        }
+
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('gameMessage');
+            messageElement.textContent = message;
+            messageElement.style.backgroundColor = type === 'error' ? '#ffebee' : '#e8f5e9';
+            messageElement.style.color = type === 'error' ? '#c62828' : '#2e7d32';
+            messageElement.style.padding = '1rem';
+            messageElement.style.marginBottom = '1rem';
+            messageElement.style.borderRadius = '5px';
+            messageElement.style.fontWeight = 'bold';
+            messageElement.style.animation = 'fadeIn 0.3s ease';
+            
+            // Clear the message after 3 seconds
+            setTimeout(() => {
+                messageElement.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    messageElement.textContent = '';
+                    messageElement.style.animation = '';
+                }, 300);
+            }, 3000);
+        }
+
+        // Initialize the visualization when the page loads
+        window.onload = () => {
+            updateTreeVisualization();
+            setRandomObjective();
+        };
+
+        // Update the input field to have maxlength attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const nodeInput = document.getElementById('nodeValue');
+            nodeInput.setAttribute('maxlength', '5');
+            
+            // Add input validation
+            nodeInput.addEventListener('input', function(e) {
+                if (this.value.length > 5) {
+                    this.value = this.value.slice(0, 5);
+                    showMessage('Maximum 5 characters allowed', 'error');
+                }
+            });
+        });
+
+        // Add new animations for messages
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+</html> 

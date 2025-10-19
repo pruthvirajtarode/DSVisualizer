@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Ended Queue - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FFB6C1;    /* Light Pink */
+            --secondary-color: #FFC0CB;   /* Pink */
+            --tertiary-color: #FFD1DC;    /* Pale Pink */
+            --quaternary-color: #FFE4E1;   /* Misty Rose */
+            --text-color: #8B5A5A;        /* Dark Pink */
+            --background-color: #FFF0F5;   /* Lavender Blush */
+            --light-purple: #F0E6FF;
+            --dark-purple: #6A5ACD;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+            border: 2px solid var(--primary-color);
+        }
+
+        .level-objectives {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.1);
+        }
+
+        .level-objectives h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .level-objectives p {
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .simple-queue-container {
+            width: 600px;
+            height: 200px;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(139, 90, 90, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .queue-element {
+            width: 100px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 8px;
+            margin: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            opacity: 1;
+        }
+
+        .queue-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            padding: 6px 18px;
+            margin: 0 10px;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+            align-items: center;
+        }
+
+        .controls .form-control {
+            width: 120px;
+            height: 38px;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .controls .btn-queue {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .controls .form-select {
+            height: 38px;
+            padding: 0 1rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .game-message {
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin: 0 0 0.5rem 0;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .game-message.success {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            color: #2E7D32;
+        }
+
+        .game-message.error {
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            color: #C62828;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .instructions h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+
+        .queue-info {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-operations, .queue-properties {
+            margin-bottom: 1.5rem;
+        }
+
+        .queue-operations h4, .queue-properties h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .queue-operations ul, .queue-properties ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .queue-operations li, .queue-properties li {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 5px;
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        @keyframes enqueueSlideIn {
+            0% { transform: translateX(60px) scale(0.7); opacity: 0; }
+            80% { transform: translateX(-8px) scale(1.08); opacity: 1; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+
+        @keyframes dequeueSlideOut {
+            0% { transform: translateX(0) scale(1); opacity: 1; }
+            100% { transform: translateX(60px) scale(0.7); opacity: 0; }
+        }
+
+        .queue-element.enqueue-anim {
+            animation: enqueueSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .queue-element.dequeue-anim {
+            animation: dequeueSlideOut 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Add peek overlay styles */
+        .peek-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .peek-overlay.visible {
+            opacity: 1;
+        }
+
+        .peek-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 4px 20px rgba(139, 90, 90, 0.2);
+        }
+
+        .peek-overlay.visible .peek-content {
+            transform: scale(1);
+        }
+
+        .peek-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        .queue-type-selection {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .queue-type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(139, 90, 90, 0.2);
+        }
+
+        .queue-type-card.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            color: white;
+        }
+
+        .queue-size-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .queue-size-input .form-control {
+            width: 80px;
+            height: 38px;
+            text-align: center;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .queue-size-input .btn-queue {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .queue-size-input .btn-queue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.2);
+        }
+
+        .size-warning {
+            color: #C62828;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sound-control:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-control i {
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .sound-control.muted i::before {
+            content: "\f6a9";
+        }
+
+        .sound-control:not(.muted) i::before {
+            content: "\f028";
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn">←</a>
+    <button class="sound-control" id="soundControl" title="Toggle Sound">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <div class="container">
+        <h1 class="text-center my-4">Queue Game</h1>
+        
+        <!-- Queue Type Selection -->
+        <div class="queue-type-selection">
+            <h3 class="mb-4">Choose a Queue Type</h3>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="queue-type-card" onclick="window.location.href='simplequeue.html'">
+                        <h4>Simple Queue</h4>
+                        <p>Basic FIFO (First In First Out) queue with operations at one end</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card" onclick="window.location.href='circularqueue.html'">
+                        <h4>Circular Queue</h4>
+                        <p>Queue with circular structure for efficient memory usage</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card selected">
+                        <h4>Double Ended Queue</h4>
+                        <p>Queue with operations possible at both ends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="text-center"> Double Ended Queue</h2>
+            <div class="level-objectives">
+                <h4>🎯 Current Objective:</h4>
+                <p id="dequeObjective" style="font-size: 1.2rem; font-weight: bold; font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">Loading objective...</p>
+            </div>
+
+            <!-- Game Message -->
+            <div id="dequeGameMessage" class="game-message"></div>
+
+            <!-- Queue Size Input -->
+            <div class="queue-size-input text-center mb-3">
+                <input type="number" id="dequeSizeInput" class="form-control" placeholder="Enter queue size" min="1" max="10" value="10" style="width: 120px; display: inline-block; margin-right: 10px;">
+                <button class="btn-queue" onclick="setDequeSize()">Set Size</button>
+                <div class="size-warning" id="dequeSizeWarning" style="display: none; color: #C62828; margin-top: 0.5rem;">Please enter a size between 1 and 10</div>
+            </div>
+
+            <!-- Queue Visualization -->
+            <div class="d-flex align-items-center justify-content-center">
+                <span class="queue-label front">Front</span>
+                <div class="simple-queue-container" id="dequeElements"></div>
+                <span class="queue-label rear">Rear</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <input type="text" class="form-control" id="dequeInput" placeholder="Enter value" maxlength="4">
+                <select class="form-select" id="insertPositionSelect">
+                    <option value="front">Front</option>
+                    <option value="rear">Rear</option>
+                </select>
+                <button class="btn-queue" onclick="insertDeque()">Insert</button>
+                <button class="btn-queue" onclick="deleteFront()">Delete Front</button>
+                <button class="btn-queue" onclick="deleteRear()">Delete Rear</button>
+                <button class="btn-queue" onclick="peekDeque()">Peek</button>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <h4>How to Play:</h4>
+                <ol>
+                    <li>First, set your desired deque size (1-10)</li>
+                    <li>Enter a value in the input field</li>
+                    <li>Choose whether to insert at front or rear</li>
+                    <li>Click "Insert" to add the value to the selected end</li>
+                    <li>Click "Delete Front" to remove from front</li>
+                    <li>Click "Delete Rear" to remove from rear</li>
+                    <li>Click "Peek" to see the front element without removing it</li>
+                </ol>
+            </div>
+
+            <!-- Queue Info -->
+            <div class="queue-info">
+                <div class="queue-operations">
+                    <h4>Deque Operations:</h4>
+                    <ul>
+                        <li><strong>Insert Front:</strong> Adds an element to the front of the deque</li>
+                        <li><strong>Insert Rear:</strong> Adds an element to the rear of the deque</li>
+                        <li><strong>Delete Front:</strong> Removes an element from the front of the deque</li>
+                        <li><strong>Delete Rear:</strong> Removes an element from the rear of the deque</li>
+                        <li><strong>Peek:</strong> Views the front element without removing it</li>
+                    </ul>
+                </div>
+
+                <div class="queue-properties">
+                    <h4>Deque Properties:</h4>
+                    <ul>
+                        <li>Can function as both FIFO and LIFO</li>
+                        <li>Elements can be added/removed from both ends</li>
+                        <li>Dynamic size implementation</li>
+                        <li>Efficient access to both ends</li>
+                        <li>Versatile data structure for various applications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sound effect system
+        class SoundEffect {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.isMuted = false;
+                this.volume = 0.1;
+            }
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                return this.isMuted;
+            }
+
+            playSound(frequency, duration, type = 'sine') {
+                if (this.isMuted) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+                
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+
+            playEnqueueSound() {
+                this.playSound(440, 0.3); // A4 note
+            }
+
+            playDequeueSound() {
+                this.playSound(330, 0.2); // E4 note
+            }
+
+            playPeekSound() {
+                this.playSound(523.25, 0.15); // C5 note
+            }
+
+            playErrorSound() {
+                this.playSound(220, 0.2, 'square'); // A3 note with square wave
+            }
+        }
+
+        // Initialize global variables
+        let deque = [];
+        let MAX_DEQUE_SIZE = 5;
+        let usedObjectives = new Set();
+        let currentObjectiveIndex = -1;
+        const soundEffect = new SoundEffect();
+
+        // Add deque objectives
+        const dequeObjectives = [
+            {
+                task: "Insert {size} elements at the front",
+                check: () => deque.length === MAX_DEQUE_SIZE && usedObjectives.has(currentObjectiveIndex),
+                message: "Great job! You've filled the deque from the front!"
+            },
+            {
+                task: "Insert {size} elements at the rear",
+                check: () => deque.length === MAX_DEQUE_SIZE && usedObjectives.has(currentObjectiveIndex),
+                message: "Excellent! You've filled the deque from the rear!"
+            },
+            {
+                task: "Insert {size/2} elements at front and {size/2} at rear",
+                check: () => deque.length === MAX_DEQUE_SIZE && usedObjectives.has(currentObjectiveIndex),
+                message: "Perfect! You've balanced the deque with front and rear insertions!"
+            },
+            {
+                task: "Create a deque with alternating front and rear insertions",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 0; i < deque.length - 1; i++) {
+                        const current = Number(deque[i]) % 2;
+                        const next = Number(deque[i + 1]) % 2;
+                        if (current === next) return false;
+                    }
+                    return true;
+                },
+                message: "Impressive! You've created a perfect alternating pattern!"
+            },
+            {
+                task: "Insert {size} elements and then remove all from front",
+                check: () => deque.length === 0 && usedObjectives.has(currentObjectiveIndex),
+                message: "Brilliant! You've successfully emptied the deque from the front!"
+            },
+            {
+                task: "Insert {size} elements and then remove all from rear",
+                check: () => deque.length === 0 && usedObjectives.has(currentObjectiveIndex),
+                message: "Outstanding! You've successfully emptied the deque from the rear!"
+            },
+            {
+                task: "Create a palindrome using deque operations",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 0; i < Math.floor(deque.length / 2); i++) {
+                        if (deque[i] !== deque[deque.length - 1 - i]) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! You've created a perfect palindrome!"
+            },
+            {
+                task: "Create a deque with all elements being multiples of 3",
+                check: () => deque.length > 0 && deque.every(num => Number(num) % 3 === 0),
+                message: "Excellent! All numbers are multiples of 3!"
+            },
+            {
+                task: "Create a deque with elements in ascending order",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 0; i < deque.length - 1; i++) {
+                        if (Number(deque[i]) > Number(deque[i + 1])) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! The deque is in perfect ascending order!"
+            },
+            {
+                task: "Create a deque with elements in descending order",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 0; i < deque.length - 1; i++) {
+                        if (Number(deque[i]) < Number(deque[i + 1])) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! The deque is in perfect descending order!"
+            },
+            {
+                task: "Create a deque with sum of adjacent elements equal to 10",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 0; i < deque.length - 1; i++) {
+                        if (Number(deque[i]) + Number(deque[i + 1]) !== 10) return false;
+                    }
+                    return true;
+                },
+                message: "Genius! All adjacent pairs sum to 10!"
+            },
+            {
+                task: "Create a deque with all elements being perfect squares",
+                check: () => deque.length > 0 && deque.every(num => Math.sqrt(Number(num)) % 1 === 0),
+                message: "Amazing! All numbers are perfect squares!"
+            },
+            {
+                task: "Create a deque with all elements being prime numbers",
+                check: () => deque.length > 0 && deque.every(num => {
+                    const n = Number(num);
+                    if (n <= 1) return false;
+                    for (let i = 2; i <= Math.sqrt(n); i++) {
+                        if (n % i === 0) return false;
+                    }
+                    return true;
+                }),
+                message: "Incredible! All numbers are prime!"
+            },
+            {
+                task: "Create a deque with elements in arithmetic sequence (difference of 3)",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 1; i < deque.length; i++) {
+                        if (Number(deque[i]) - Number(deque[i - 1]) !== 3) return false;
+                    }
+                    return true;
+                },
+                message: "Brilliant! You've created a perfect arithmetic sequence!"
+            },
+            {
+                task: "Create a deque with elements in geometric sequence (ratio of 2)",
+                check: () => {
+                    if (deque.length < 2) return false;
+                    for (let i = 1; i < deque.length; i++) {
+                        if (Number(deque[i]) / Number(deque[i - 1]) !== 2) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! You've created a perfect geometric sequence!"
+            },
+            {
+                task: "Create a deque with all elements being multiples of 5",
+                check: () => deque.length > 0 && deque.every(num => Number(num) % 5 === 0),
+                message: "Excellent! All numbers are multiples of 5!"
+            },
+            {
+                task: "Create a deque with no duplicate elements",
+                check: () => new Set(deque).size === deque.length,
+                message: "Great job! Your deque has all unique elements!"
+            },
+            {
+                task: "Create a deque with elements in Fibonacci sequence",
+                check: () => {
+                    if (deque.length < 3) return false;
+                    for (let i = 2; i < deque.length; i++) {
+                        const current = Number(deque[i]);
+                        const prev1 = Number(deque[i - 1]);
+                        const prev2 = Number(deque[i - 2]);
+                        if (current !== prev1 + prev2) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! You've created a Fibonacci sequence!"
+            },
+            {
+                task: "Create a deque with all elements being multiples of 4",
+                check: () => deque.length > 0 && deque.every(num => Number(num) % 4 === 0),
+                message: "Excellent! All numbers are multiples of 4!"
+            },
+            {
+                task: "Create a deque with all elements being multiples of 7",
+                check: () => deque.length > 0 && deque.every(num => Number(num) % 7 === 0),
+                message: "Perfect! All numbers are multiples of 7!"
+            }
+        ];
+
+        function getRandomObjective() {
+            // If all objectives have been used, reset the used objectives
+            if (usedObjectives.size === dequeObjectives.length) {
+                usedObjectives.clear();
+            }
+
+            // Get a random objective that hasn't been used recently
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * dequeObjectives.length);
+            } while (usedObjectives.has(randomIndex));
+
+            usedObjectives.add(randomIndex);
+            currentObjectiveIndex = randomIndex;
+            return randomIndex;
+        }
+
+        function setRandomDequeObjective() {
+            const randomIndex = getRandomObjective();
+            let objective = dequeObjectives[randomIndex].task;
+            objective = objective.replace('{size}', MAX_DEQUE_SIZE);
+            objective = objective.replace('{size/2}', Math.floor(MAX_DEQUE_SIZE / 2));
+            document.getElementById('dequeObjective').textContent = objective;
+        }
+
+        function checkDequeObjective() {
+            if (currentObjectiveIndex === -1) return;
+            
+            const currentObjective = dequeObjectives[currentObjectiveIndex];
+            if (currentObjective.check()) {
+                showDequeMessage(currentObjective.message, "success");
+                setTimeout(setRandomDequeObjective, 2000);
+            }
+        }
+
+        function setDequeSize() {
+            const sizeInput = document.getElementById('dequeSizeInput');
+            const size = parseInt(sizeInput.value);
+            const warning = document.getElementById('dequeSizeWarning');
+
+            if (size >= 1 && size <= 10) {
+                MAX_DEQUE_SIZE = size;
+                deque = []; // Reset deque
+                updateDequeDisplay();
+                warning.style.display = 'none';
+                showDequeMessage(`Deque size set to ${size}`, "success");
+                setRandomDequeObjective();
+            } else {
+                warning.style.display = 'block';
+                showDequeMessage("Please enter a size between 1 and 10", "error");
+            }
+        }
+
+        function insertDeque() {
+            const input = document.getElementById('dequeInput');
+            const value = input.value.trim();
+            const position = document.getElementById('insertPositionSelect').value;
+            
+            if (value) {
+                if (value.length > 4) {
+                    showDequeMessage('Value is too long! Maximum 4 digits allowed.', "error");
+                    soundEffect.playErrorSound();
+                    return;
+                }
+
+                if (!/^\d{1,4}$/.test(value)) {
+                    showDequeMessage('Please enter only digits (0-9)!', "error");
+                    soundEffect.playErrorSound();
+                    return;
+                }
+
+                if (deque.length >= MAX_DEQUE_SIZE) {
+                    showDequeMessage('Deque is full!', "error");
+                    soundEffect.playErrorSound();
+                    return;
+                }
+                
+                if (position === 'front') {
+                    deque.unshift(value);
+                    updateDequeDisplay('enqueue', 0);
+                } else {
+                    deque.push(value);
+                    updateDequeDisplay('enqueue', deque.length - 1);
+                }
+                
+                soundEffect.playEnqueueSound();
+                input.value = '';
+                checkDequeObjective();
+            }
+        }
+
+        function deleteFront() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+            
+            const container = document.getElementById('dequeElements');
+            if (container.firstChild) {
+                container.firstChild.classList.add('dequeue-anim');
+                setTimeout(() => {
+                    deque.shift();
+                    updateDequeDisplay();
+                    soundEffect.playDequeueSound();
+                    checkDequeObjective();
+                }, 400);
+            }
+        }
+
+        function deleteRear() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+            
+            const container = document.getElementById('dequeElements');
+            if (container.lastChild) {
+                container.lastChild.classList.add('dequeue-anim');
+                setTimeout(() => {
+                    deque.pop();
+                    updateDequeDisplay();
+                    soundEffect.playDequeueSound();
+                    checkDequeObjective();
+                }, 400);
+            }
+        }
+
+        function updateDequeDisplay(animType, animIdx) {
+            const container = document.getElementById('dequeElements');
+            container.innerHTML = '';
+            
+            // Calculate element width based on deque size
+            const elementWidth = Math.min(100, 600 / MAX_DEQUE_SIZE);
+            
+            deque.forEach((value, idx) => {
+                const element = document.createElement('div');
+                element.className = 'queue-element';
+                element.style.width = `${elementWidth}px`;
+                element.textContent = value;
+                if (animType === 'enqueue' && idx === animIdx) {
+                    element.classList.add('enqueue-anim');
+                }
+                container.appendChild(element);
+            });
+        }
+
+        function showDequeMessage(message, type) {
+            const messageElement = document.getElementById('dequeGameMessage');
+            messageElement.textContent = message;
+            messageElement.className = `game-message ${type}`;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 2000);
+        }
+
+        function peekDeque() {
+            if (deque.length === 0) {
+                showDequeMessage('Deque is empty!', "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            const frontElement = deque[0];
+            soundEffect.playPeekSound();
+            
+            // Create peek overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'peek-overlay';
+            
+            const content = document.createElement('div');
+            content.className = 'peek-content';
+            
+            const value = document.createElement('div');
+            value.className = 'peek-value';
+            value.textContent = frontElement;
+            
+            content.appendChild(value);
+            overlay.appendChild(content);
+            document.body.appendChild(overlay);
+            
+            // Show overlay
+            setTimeout(() => {
+                overlay.classList.add('visible');
+            }, 10);
+            
+            // Remove overlay after 1 second
+            setTimeout(() => {
+                overlay.classList.remove('visible');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }, 1000);
+        }
+
+        // Initialize when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial size and objective
+            setDequeSize();
+            
+            // Add input focus handlers
+            document.querySelectorAll('input[type="text"]').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.value = ''; // Clear input when focused
+                });
+            });
+
+            // Sound control button
+            const soundControl = document.getElementById('soundControl');
+            soundControl.addEventListener('click', () => {
+                const isMuted = soundEffect.toggleMute();
+                soundControl.classList.toggle('muted', isMuted);
+            });
+        });
+    </script>
+</body>
+</html> 

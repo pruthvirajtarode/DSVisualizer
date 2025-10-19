@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Trees in Data Structures</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #050774;
+            --secondary-gradient: linear-gradient(90deg, #000000 0%, #ffffff 100%);
+            --accent-color: #e74c3c;
+            --background-color: #ffffff;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .tree-info, .characteristics, .complexity, .applications, .pseudocode {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .tree-info:hover, .characteristics:hover, .complexity:hover, .applications:hover, .pseudocode:hover {
+            transform: translateY(-5px);
+        }
+
+        .tree-image {
+            text-align: center;
+            margin: 2rem 0;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .tree-image:hover {
+            transform: scale(1.02);
+        }
+
+        .tree-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        /* Specific size control for tree images */
+        .tree-image img[src="tree1.png"],
+        .tree-image img[src="tree2.png"],
+        .tree-image img[src="tree3.png"] {
+            max-width: 70%;
+        }
+
+        .tree-image img[src="treeb.png"],
+        .tree-image img[src="treet.png"],
+        .tree-image img[src="treet2.png"] {
+            max-width: 60%;
+        }
+
+        .tree-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .tree-image p {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        .tree-types {
+            text-align: left;
+            padding: 1rem 2rem;
+            margin-top: 2rem;
+            background-color: var(--background-color);
+            border-radius: 8px;
+        }
+
+        .tree-types h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+            font-size: 1.4rem;
+            border-bottom: 2px solid var(--secondary-color);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .tree-types h3:first-child {
+            margin-top: 0;
+        }
+
+        .tree-types p {
+            margin: 1rem 0;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        .tree-types ul {
+            list-style-type: disc;
+            padding-left: 2rem;
+            margin: 1rem 0;
+        }
+
+        .tree-types li {
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            background-color: var(--card-bg);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .tree-types li:before {
+            content: none;
+        }
+
+        .tree-types li:hover {
+            transform: translateX(10px);
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .traversal-type {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .traversal-type h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 1rem;
+        }
+
+        .traversal-type p {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .traversal-type ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
+        }
+
+        .traversal-type li {
+            margin: 0.5rem 0;
+            padding: 0.5rem 0;
+            background: none;
+            color: var(--text-color);
+            transition: none;
+        }
+
+        .traversal-type li:hover {
+            transform: none;
+            background: none;
+            color: var(--text-color);
+        }
+
+        .traversal-type li:before {
+            content: none;
+        }
+
+        .traversal-visualization {
+            margin-bottom: 2rem;
+        }
+
+        .traversal-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .implementation {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border-radius: 8px;
+        }
+
+        .implementation h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .implementation pre {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+        }
+
+        .code-explanation {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-explanation h5 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 0.8rem;
+        }
+
+        .code-explanation p {
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+
+        .code-explanation ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .code-explanation li {
+            margin: 0.3rem 0;
+            padding: 0.3rem 0.8rem;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            list-style-type: disc;
+        }
+
+        .code-explanation li:before {
+            content: none;
+        }
+
+        .code-explanation strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .application-category {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .application-category:hover {
+            transform: translateY(-5px);
+        }
+
+        .application-category h3 {
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 1rem;
+        }
+
+        .application-category ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+
+        .application-category li {
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            list-style-type: disc;
+            position: relative;
+        }
+
+        .application-category li:before {
+            content: none;
+        }
+
+        .application-category li:hover {
+            transform: translateX(10px);
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        /* Reset padding for application category list items */
+        .application-category li {
+            padding-left: 1rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        li:before {
+            content: "→";
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateX(10px);
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        li:hover:before {
+            color: white;
+        }
+
+        pre {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        pre::before {
+            content: "Code Example";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: var(--secondary-gradient);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .tree-info, .characteristics, .complexity, .applications, .pseudocode {
+                padding: 1.5rem;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* New styles for reorganized content */
+        .tree-images-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tree-images-section .tree-image {
+            margin: 2rem 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tree-descriptions-section {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .description-block {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: var(--background-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .description-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .description-block h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 1rem;
+        }
+
+        /* New styles for image with description layout */
+        .tree-image-with-desc {
+            margin: 3rem 0;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tree-image-with-desc .tree-image {
+            margin: 0;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tree-image-with-desc .tree-image img {
+            max-width: 70%;
+            height: auto;
+        }
+
+        .image-description {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+        }
+
+        .image-description h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 1rem;
+            text-align: left;
+        }
+
+        .image-description p {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            text-align: left;
+        }
+
+        .tree-types-explanation {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--background-color);
+        }
+
+        .tree-types-explanation h4 {
+            color: var(--primary-color);
+            margin: 1.5rem 0 0.75rem 0;
+            font-size: 1.1rem;
+            border-left: 3px solid var(--secondary-color);
+            padding-left: 0.75rem;
+        }
+
+        .tree-types-explanation h4:first-child {
+            margin-top: 0;
+        }
+
+        .tree-types-explanation p {
+            margin: 0.5rem 0;
+        }
+
+        .tree-types-explanation ul {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+            list-style-type: disc;
+        }
+
+        .tree-types-explanation li {
+            margin: 0.4rem 0;
+            padding: 0.3rem 0;
+            background: none;
+            color: var(--text-color);
+            position: relative;
+            padding-left: 0;
+        }
+
+        .tree-types-explanation li:before {
+            content: none;
+        }
+
+        .tree-types-explanation li:hover {
+            transform: none;
+            background: none;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+        
+    <div class="container animate-fade-in">
+        <h1 class="animate-slide-up">Trees in Data Structures</h1>
+        
+        <!-- All Images Section -->
+        <div class="tree-images-section animate-slide-up">
+            <h2>Tree Visualizations</h2>
+            
+            <div class="tree-image-with-desc">
+                <div class="tree-image">
+                    <img src="tree1.png" alt="Basic Tree Structure">
+                </div>
+                <div class="image-description">
+                    <h3>Basic Tree Structure</h3>
+                    <p>A basic tree structure showing the root node, parent-child relationships, and leaf nodes. The root is at the top, and each node can have multiple children.</p>
+                    
+                    <div class="tree-types-explanation">
+                        <h4>Tree Components</h4>
+                        <ul>
+                            <li><strong>Root Node:</strong> The topmost node in the tree. It has no parent and serves as the starting point for traversing the tree.</li>
+                            <li><strong>Parent Node:</strong> Any node that has one or more child nodes. A parent node is connected to its children through edges.</li>
+                            <li><strong>Child Node:</strong> A node that has a parent node. Each child node is connected to its parent through an edge.</li>
+                            <li><strong>Sibling Nodes:</strong> Nodes that share the same parent. They are at the same level in the tree hierarchy.</li>
+                            <li><strong>Leaf Node:</strong> A node that has no children. It represents the end of a branch in the tree.</li>
+                            <li><strong>Internal Node:</strong> Any node that has at least one child node (non-leaf nodes).</li>
+                            <li><strong>Edge:</strong> The connection between a parent node and its child node.</li>
+                            <li><strong>Path:</strong> A sequence of nodes and edges from the root to any other node in the tree.</li>
+                            <li><strong>Level:</strong> The distance from the root node. The root is at level 0, its children at level 1, and so on.</li>
+                            <li><strong>Height:</strong> The length of the longest path from the root to a leaf node.</li>
+                            <li><strong>Depth:</strong> The length of the path from the root to a specific node.</li>
+                            <li><strong>Degree:</strong> The number of children a node has.</li>
+                        </ul>
+
+                        <h4>Tree Properties</h4>
+                        <ul>
+                            <li>Each node (except the root) has exactly one parent</li>
+                            <li>There are no cycles in a tree structure</li>
+                            <li>There is exactly one path from the root to any node</li>
+                            <li>The number of edges is always one less than the number of nodes</li>
+                            <li>Adding an edge between any two nodes creates a cycle</li>
+                            <li>Removing any edge disconnects the tree</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tree-image-with-desc">
+                <div class="tree-image">
+                    <img src="tree2.png" alt="Binary Tree Example">
+                        </div>
+                <div class="image-description">
+                    <h3>Types of Trees</h3>
+                    <p>A binary tree where each node has at most two children, commonly referred to as left and right children. This structure is fundamental for many tree-based algorithms.</p>
+                    
+                    <div class="tree-types-explanation">
+                        <h4>Binary Tree</h4>
+                        <p>A tree where each node can have at most two children:</p>
+                        <ul>
+                            <li>Each node has 0, 1, or 2 children</li>
+                            <li>Children are typically called "left" and "right" child</li>
+                            <li>Common in search algorithms and expression parsing</li>
+                            <li>Examples: Binary Search Trees (BST), AVL Trees</li>
+                        </ul>
+
+                        <h4>Ternary Tree</h4>
+                        <p>A tree where each node can have at most three children:</p>
+                        <ul>
+                            <li>Each node has 0 to 3 children</li>
+                            <li>Often used in specialized searching algorithms</li>
+                            <li>Common in Ternary Search Trees (TST)</li>
+                            <li>Useful for storing and searching strings efficiently</li>
+                        </ul>
+
+                        <h4>N-ary Tree</h4>
+                        <p>A tree where each node can have any number of children:</p>
+                        <ul>
+                            <li>Also known as a k-ary tree or multiway tree</li>
+                            <li>Each node can have 0 to n children</li>
+                            <li>Used in file systems (folders can have multiple files)</li>
+                            <li>Common in representing hierarchical data structures</li>
+                            <li>Examples: DOM tree, file system hierarchy</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tree-image-with-desc">
+                <div class="tree-image">
+                    <img src="treeb.png" alt="Balanced Tree Structure">
+                </div>
+                <div class="image-description">
+                    <h3>Balanced Tree</h3>
+                    <p>A balanced tree maintains approximately equal height for all subtrees, ensuring O(log n) time complexity for operations. Examples include AVL trees and Red-Black trees.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Descriptions Section -->
+        <div class="tree-descriptions-section animate-slide-up">
+            <h2>Understanding Tree Structures</h2>
+
+            <div class="tree-info animate-slide-up">
+                <h3>Introduction to Trees</h3>
+                <p>
+                    A tree is a hierarchical data structure composed of nodes connected by edges. Each node contains a value and 
+                    references to its child nodes. Trees are widely used for representing hierarchical relationships, organizing data 
+                    for efficient searching and sorting, and modeling real-world hierarchical structures.
+                </p>
+            </div>
+
+            <div class="tree-image animate-slide-up">
+                <h2>Tree Traversal Methods</h2>
+                <img src="treet.png" alt="Tree Traversal Methods">
+                <div class="tree-types">
+                    <h3>Understanding Tree Traversals</h3>
+                    <p class="traversal-intro">Looking at the binary tree in the image with root node 1, we can understand the different traversal patterns:</p>
+
+                    <div class="traversal-type">
+                        <h4>1. Inorder Traversal (Left → Root → Right)</h4>
+                        <p>Following the green arrows in the image:</p>
+                        <ul>
+                            <li>Start at root (1), but first traverse left subtree</li>
+                            <li>Visit left subtree: 4 → 2 → 5</li>
+                            <li>Visit root: 1</li>
+                            <li>Visit right subtree: 6 → 3 → 7</li>
+                            <li><strong>Output Sequence:</strong> 4 → 2 → 5 → 1 → 6 → 3 → 7</li>
+                            <li><em>Process: Visit left child, then current node, then right child at each step</em></li>
+                        </ul>
+                    </div>
+
+                    <div class="traversal-type">
+                        <h4>2. Preorder Traversal (Root → Left → Right)</h4>
+                        <p>Following the blue arrows in the image:</p>
+                        <ul>
+                            <li>Start by visiting root: 1</li>
+                            <li>Visit left subtree: 2 → 4 → 5</li>
+                            <li>Visit right subtree: 3 → 6 → 7</li>
+                            <li><strong>Output Sequence:</strong> 1 → 2 → 4 → 5 → 3 → 6 → 7</li>
+            </ul>
+                    </div>
+
+                    <div class="traversal-type">
+                        <h4>3. Postorder Traversal (Left → Right → Root)</h4>
+                        <p>Following the red arrows in the image:</p>
+                        <ul>
+                            <li>First visit left subtree completely: 4 → 5 → 2</li>
+                            <li>Then visit right subtree: 6 → 7 → 3</li>
+                            <li>Finally visit root: 1</li>
+                            <li><strong>Output Sequence:</strong> 4 → 5 → 2 → 6 → 7 → 3 → 1</li>
+            </ul>
+                    </div>
+
+                    <div class="traversal-type">
+                        <h4>4. Level Order Traversal (Breadth-First)</h4>
+                        <p>Visiting level by level in the image:</p>
+                        <ul>
+                            <li>Level 1 (Root): 1</li>
+                            <li>Level 2 (Left to Right): 2 → 3</li>
+                            <li>Level 3 (Left to Right): 4 → 5 → 6 → 7</li>
+                            <li><strong>Output Sequence:</strong> 1 → 2 → 3 → 4 → 5 → 6 → 7</li>
+            </ul>
+                    </div>
+
+                    <div class="implementation">
+                        <h4>Implementation Example:</h4>
+                <pre>
+class TreeNode {
+    int val;                    // Value stored in the node
+    TreeNode left, right;       // References to left and right children
+}
+
+// Inorder traversal (green arrows)
+void inorder(TreeNode root) {
+    if (root != null) {
+        inorder(root.left);     // Step 1: Traverse left subtree
+        visit(root);            // Step 2: Visit current node
+        inorder(root.right);    // Step 3: Traverse right subtree
+    }
+}
+
+// Preorder traversal (blue arrows)
+void preorder(TreeNode root) {
+    if (root != null) {
+        visit(root);            // Step 1: Visit current node
+        preorder(root.left);    // Step 2: Traverse left subtree
+        preorder(root.right);   // Step 3: Traverse right subtree
+    }
+}
+
+// Postorder traversal (red arrows)
+void postorder(TreeNode root) {
+    if (root != null) {
+        postorder(root.left);   // Step 1: Traverse left subtree
+        postorder(root.right);  // Step 2: Traverse right subtree
+        visit(root);            // Step 3: Visit current node
+    }
+}
+
+// Level-order traversal
+void levelOrder(TreeNode root) {
+    if (root == null) return;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    
+    while (!queue.isEmpty()) {
+        TreeNode node = queue.poll();
+        visit(node);
+        if (node.left != null) queue.offer(node.left);
+        if (node.right != null) queue.offer(node.right);
+    }
+}</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="applications animate-slide-up">
+                <h2>Tree Applications</h2>
+                <div class="application-category">
+                    <h3>1. File Systems and Organization</h3>
+                    <ul>
+                        <li>Directory and file hierarchical structure representation</li>
+                        <li>File system navigation and path resolution</li>
+                        <li>Efficient file and folder searching</li>
+                        <li>Access control and permission management</li>
+                    </ul>
+                </div>
+
+                <div class="application-category">
+                    <h3>2. Database Systems</h3>
+                    <ul>
+                        <li>B-trees and B+ trees for indexing</li>
+                        <li>Query optimization and execution plans</li>
+                        <li>Efficient range queries and sorting</li>
+                        <li>Database schema representation</li>
+                    </ul>
+                </div>
+
+                <div class="application-category">
+                    <h3>3. Programming and Compilers</h3>
+                    <ul>
+                        <li>Abstract Syntax Trees (AST) for code representation</li>
+                        <li>Expression evaluation and parsing</li>
+                        <li>Symbol tables and scope management</li>
+                        <li>Code optimization and analysis</li>
+                    </ul>
+                </div>
+
+                <div class="application-category">
+                    <h3>4. Web Development</h3>
+                    <ul>
+                        <li>HTML DOM (Document Object Model) structure</li>
+                        <li>CSS selector matching and styling</li>
+                        <li>Virtual DOM in modern frameworks</li>
+                        <li>XML and JSON data parsing</li>
+                    </ul>
+                </div>
+
+                <div class="application-category">
+                    <h3>5. Artificial Intelligence</h3>
+                    <ul>
+                        <li>Decision trees for classification and prediction</li>
+                        <li>Game trees for strategic planning</li>
+                        <li>Minimax algorithm implementation</li>
+                        <li>Natural Language Processing parse trees</li>
+                    </ul>
+                </div>
+
+                <div class="application-category">
+                    <h3>6. Network Routing</h3>
+                    <ul>
+                        <li>Network topology representation</li>
+                        <li>Shortest path algorithms</li>
+                        <li>Multicast routing trees</li>
+                        <li>Network packet routing decisions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="characteristics animate-slide-up">
+                <h2>Key Characteristics</h2>
+                <ul>
+                    <li>Hierarchical structure with a single root node</li>
+                    <li>Each node can have multiple children</li>
+                    <li>No cycles or loops in the structure</li>
+                    <li>Efficient for searching and organizing hierarchical data</li>
+                    <li>Various specialized forms for different use cases</li>
+                </ul>
+            </div>
+
+            <div class="complexity animate-slide-up">
+                <h2>Time Complexity</h2>
+                <ul>
+                    <li>Search: O(log n) for balanced trees</li>
+                    <li>Insertion: O(log n) for balanced trees</li>
+                    <li>Deletion: O(log n) for balanced trees</li>
+                    <li>Traversal: O(n) for visiting all nodes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Quiz - Easy Level</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 700px;
+            width: 95vw;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: #2d6a4f;
+            text-align: center;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .options {
+            margin-bottom: 1.2rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+            padding: 0.8rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 12px;
+            border: 2px solid #e3f6e5;
+            background: #f6fffa;
+            color: #217a36;
+            font-weight: 500;
+            text-align: left;
+            transition: background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .option-btn.selected {
+            background: #cbe9d7;
+            border: 2px solid #88d8b0;
+            color: #145c2c;
+        }
+        .option-btn.correct {
+            background: #a8e6cf;
+            border: 2px solid #2ecc40;
+            color: #217a36;
+        }
+        .option-btn.incorrect {
+            background: #ffb3b3;
+            border: 2px solid #ff8b8b;
+            color: #b91c1c;
+        }
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .next-btn, .restart-btn {
+            display: inline-block;
+            padding: 0.7rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .next-btn:hover, .restart-btn:hover {
+            background: linear-gradient(90deg, #cbe9d7 0%, #e3f6e5 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .final-score, .next-level-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #217a36;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .next-level-container {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s, transform 0.7s;
+            margin-top: 2.5rem;
+        }
+        .next-level-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .next-level-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 16px rgba(139, 115, 85, 0.08);
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInBtn 1s 0.7s forwards;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 id="quizTitle">Queue Quiz - Easy Level</h1>
+        <div id="quiz"></div>
+    </div>
+    <script>
+    const easyQuestions = [
+        {
+            q: "What is the order of a simple queue?",
+            options: ["LIFO", "FIFO", "FILO", "LILO"],
+            answer: 1
+        },
+        {
+            q: "Which operation adds an element to a queue?",
+            options: ["Pop", "Push", "Enqueue", "Dequeue"],
+            answer: 2
+        },
+        {
+            q: "Which operation removes an element from a queue?",
+            options: ["Pop", "Enqueue", "Insert", "Dequeue"],
+            answer: 3
+        },
+        {
+            q: "What is the time complexity of enqueue and dequeue in a queue (array-based)?",
+            options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
+            answer: 2
+        },
+        {
+            q: "Which data structure can be used to implement a queue?",
+            options: ["Array", "Linked List", "Both A and B", "Stack"],
+            answer: 2
+        },
+        {
+            q: "Which of the following is true for a circular queue?",
+            options: ["It allows elements to be added only at the front", "It avoids wastage of space", "It uses a tree structure", "It only stores elements in sorted order"],
+            answer: 1
+        },
+        {
+            q: "In a queue implemented using an array, what condition indicates overflow?",
+            options: ["front == rear", "rear == size - 1", "front == -1", "rear == -1"],
+            answer: 1
+        },
+        {
+            q: "Which of the following is not a valid queue type?",
+            options: ["Simple queue", "Circular queue", "Binary queue", "Priority queue"],
+            answer: 2
+        },
+        {
+            q: "What is the main advantage of circular queue over simple queue?",
+            options: ["Faster access", "Less memory", "No limit on size", "Efficient memory usage"],
+            answer: 3
+        },
+        {
+            q: "Which of these is the correct initial value of front and rear in an empty queue (array-based)?",
+            options: ["front = 1, rear = 0", "front = rear = -1", "front = 0, rear = 1", "front = rear = 0"],
+            answer: 1
+        }
+    ];
+
+    const mediumQuestions = [
+        {
+            q: "In a circular queue, the next position of rear after the last index is:",
+            options: ["rear + 1", "0", "size", "-1"],
+            answer: 1
+        },
+        {
+            q: "Which of the following best describes a double-ended queue (deque)?",
+            options: ["Allows insertion at one end only", "Allows deletion from both ends only", "Allows insertion and deletion at both ends", "Acts like a stack"],
+            answer: 2
+        },
+        {
+            q: "In a priority queue, elements are dequeued based on:",
+            options: ["Their position", "Their priority", "Time of insertion", "Random selection"],
+            answer: 1
+        },
+        {
+            q: "Which queue type is best suited for CPU scheduling?",
+            options: ["Simple Queue", "Circular Queue", "Priority Queue", "Deque"],
+            answer: 2
+        },
+        {
+            q: "Which of the following is not a valid operation in deque?",
+            options: ["insertFront()", "insertRear()", "removeMiddle()", "deleteRear()"],
+            answer: 2
+        },
+        {
+            q: "In a circular queue, how do you check for full condition?",
+            options: ["front == rear", "(rear + 1) % size == front", "front == -1", "rear == size"],
+            answer: 1
+        },
+        {
+            q: "Which of the following queues allows insertion and deletion from both ends, but not simultaneously?",
+            options: ["Input-restricted deque", "Output-restricted deque", "Circular queue", "Simple queue"],
+            answer: 0
+        },
+        {
+            q: "Which real-world scenario is modeled by a priority queue?",
+            options: ["Call center waiting line", "Printer task scheduling", "Bus ticket line", "Queue in bank"],
+            answer: 1
+        },
+        {
+            q: "Which of these is true about max-priority queues?",
+            options: ["Highest priority = highest numerical value", "Only the lowest priority is dequeued", "All elements have same priority", "FIFO is strictly maintained"],
+            answer: 0
+        },
+        {
+            q: "What is the time complexity of insertion in a priority queue implemented with a heap?",
+            options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+            answer: 1
+        }
+    ];
+
+    const hardQuestions = [
+        {
+            q: "Which of the following is the most efficient data structure to implement a priority queue?",
+            options: ["Array", "Linked List", "Binary Heap", "Stack"],
+            answer: 2
+        },
+        {
+            q: "What happens when you enqueue in a full circular queue?",
+            options: ["It overwrites front", "It causes overflow", "It inserts at start", "It resizes automatically"],
+            answer: 1
+        },
+        {
+            q: "Which operation is costly in a priority queue implemented using an unsorted array?",
+            options: ["Enqueue", "Dequeue", "isEmpty", "isFull"],
+            answer: 1
+        },
+        {
+            q: "In a deque, what happens when you try to delete from front when deque is empty?",
+            options: ["It resets rear", "It does nothing", "Underflow error", "Overflow error"],
+            answer: 2
+        },
+        {
+            q: "How is a circular deque different from a simple deque?",
+            options: ["It does not exist", "It allows overwriting", "It connects front and rear ends", "It only allows rear insertion"],
+            answer: 2
+        },
+        {
+            q: "Which of the following applications uses deque?",
+            options: ["Backtracking (e.g., undo operation)", "CPU scheduling", "Depth-first search", "Hashing"],
+            answer: 0
+        },
+        {
+            q: "In a priority queue, how do we resolve tie-breaking when two elements have the same priority?",
+            options: ["Randomly", "By insertion order", "By removing both", "By comparing memory address"],
+            answer: 1
+        },
+        {
+            q: "Which of the following is the best way to implement multiple queues using a single array?",
+            options: ["Use separate arrays", "Use a 2D array", "Divide the array into k parts", "Use a circular array and linked indexing"],
+            answer: 3
+        },
+        {
+            q: "In a double-ended queue, which version restricts deletion from one end only?",
+            options: ["Full deque", "Restricted deque", "Output-restricted deque", "Circular deque"],
+            answer: 2
+        },
+        {
+            q: "In a circular queue implemented with a fixed-size array, if front = 2, rear = 1, and size = 5, how many elements are in the queue?",
+            options: ["0", "4", "3", "5"],
+            answer: 1
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = null;
+    let quizCompleted = false;
+    let currentLevel = 'easy';
+
+    function getCurrentQuestions() {
+        switch(currentLevel) {
+            case 'medium':
+                return mediumQuestions;
+            case 'hard':
+                return hardQuestions;
+            default:
+                return easyQuestions;
+        }
+    }
+
+    function loadQuestion() {
+        const questions = getCurrentQuestions();
+        const question = questions[currentQuestion];
+        document.getElementById('quizTitle').textContent = `Queue Quiz - ${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level`;
+        document.getElementById('quiz').innerHTML = `
+            <div class="score">Score: ${score}/10</div>
+            <div class="question">${currentQuestion + 1}. ${question.q}</div>
+            <div class="options">
+                ${question.options.map((option, index) => `
+                    <button class="option-btn" onclick="selectOption(${index})">${option}</button>
+                `).join('')}
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <button class="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        `;
+    }
+
+    window.selectOption = function(index) {
+        if (quizCompleted) return;
+        const questions = getCurrentQuestions();
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(button => button.classList.remove('selected'));
+        buttons[index].classList.add('selected');
+        selectedOption = index;
+        const correct = index === questions[currentQuestion].answer;
+        buttons.forEach(button => {
+            button.disabled = true;
+            const buttonIndex = Array.from(buttons).indexOf(button);
+            if (buttonIndex === questions[currentQuestion].answer) {
+                button.classList.add('correct');
+            } else if (buttonIndex === index && !correct) {
+                button.classList.add('incorrect');
+            }
+        });
+        if (correct) {
+            score++;
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Correct!</span>';
+        } else {
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Incorrect!</span>';
+        }
+        document.querySelector('.next-btn').style.display = 'inline-block';
+    }
+
+    window.nextQuestion = function() {
+        currentQuestion++;
+        selectedOption = null;
+        const questions = getCurrentQuestions();
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizCompleted = true;
+        const questions = getCurrentQuestions();
+        let resultsHtml = '';
+        if (score >= 7) {
+            let nextButtonText = '';
+            let nextLevel = '';
+            let extraButton = '';
+            if (currentLevel === 'easy') {
+                nextButtonText = 'Next Level →';
+                nextLevel = 'medium';
+            } else if (currentLevel === 'medium') {
+                nextButtonText = 'Next Level →';
+                nextLevel = 'hard';
+            } else if (currentLevel === 'hard') {
+                nextButtonText = '';
+                nextLevel = '';
+                extraButton = `<div class='next-level-container show'><button class='next-level-btn' onclick="window.location.href='quiz.html'">Back to Quiz Menu</button></div>`;
+            }
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level Complete!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+                ${nextLevel ? `<div class='next-level-container show'><button class='next-level-btn' onclick='goToLevel("${nextLevel}")'>${nextButtonText}</button></div>` : ''}
+                ${extraButton}
+            `;
+        } else {
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level - Try Again!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+            `;
+        }
+        document.getElementById('quiz').innerHTML = `
+            ${resultsHtml}
+            <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+        `;
+    }
+
+    window.goToLevel = function(level) {
+        currentLevel = level;
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = null;
+        quizCompleted = false;
+        loadQuestion();
+    }
+
+    window.restartQuiz = function() {
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = null;
+        quizCompleted = false;
+        loadQuestion();
+    }
+
+    // Initialize quiz
+    loadQuestion();
+    </script>
+</body>
+</html> 

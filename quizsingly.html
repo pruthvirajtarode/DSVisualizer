@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singly Linked List Quiz - Easy Level</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 700px;
+            width: 95vw;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: #2d6a4f;
+            text-align: center;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .options {
+            margin-bottom: 1.2rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+            padding: 0.8rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 12px;
+            border: 2px solid #e3f6e5;
+            background: #f6fffa;
+            color: #217a36;
+            font-weight: 500;
+            text-align: left;
+            transition: background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .option-btn.selected {
+            background: #cbe9d7;
+            border: 2px solid #88d8b0;
+            color: #145c2c;
+        }
+        .option-btn.correct {
+            background: #a8e6cf;
+            border: 2px solid #2ecc40;
+            color: #217a36;
+        }
+        .option-btn.incorrect {
+            background: #ffb3b3;
+            border: 2px solid #ff8b8b;
+            color: #b91c1c;
+        }
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .next-btn, .restart-btn {
+            display: inline-block;
+            padding: 0.7rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .next-btn:hover, .restart-btn:hover {
+            background: linear-gradient(90deg, #cbe9d7 0%, #e3f6e5 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .final-score, .next-level-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #217a36;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .next-level-container {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s, transform 0.7s;
+            margin-top: 2.5rem;
+        }
+        .next-level-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .next-level-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 16px rgba(139, 115, 85, 0.08);
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInBtn 1s 0.7s forwards;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 id="quizTitle">Singly Linked List Quiz - Easy Level</h1>
+        <div id="quiz"></div>
+    </div>
+    <script>
+    const easyQuestions = [
+        {
+            q: "What does a node in a singly linked list contain?",
+            options: ["Data only", "Pointer only", "Data and pointer to next node", "Data and two pointers"],
+            answer: 2
+        },
+        {
+            q: "What is the pointer in the last node of a singly linked list set to?",
+            options: ["Address of first node", "Address of previous node", "NULL", "0"],
+            answer: 2
+        },
+        {
+            q: "What is the time complexity to insert a node at the beginning of a singly linked list?",
+            options: ["O(n)", "O(1)", "O(log n)", "O(n²)"],
+            answer: 1
+        },
+        {
+            q: "Which operation is not efficient in a singly linked list compared to an array?",
+            options: ["Insertion at the beginning", "Insertion at the end", "Traversal", "Random access"],
+            answer: 3
+        },
+        {
+            q: "What is required to delete the first node of a singly linked list?",
+            options: ["Pointer to last node", "Pointer to second node", "Head pointer", "NULL pointer"],
+            answer: 2
+        },
+        {
+            q: "Which of the following is not true about singly linked lists?",
+            options: ["Each node contains a data field", "Nodes can be easily inserted at the beginning", "Nodes can be easily accessed using index", "Each node points to the next node"],
+            answer: 2
+        },
+        {
+            q: "In a singly linked list, how do you know you've reached the end?",
+            options: ["When the data is 0", "When the next pointer is NULL", "When index reaches 0", "When the node has a loop"],
+            answer: 1
+        },
+        {
+            q: "What is the first node of a singly linked list called?",
+            options: ["Tail", "Root", "Head", "Start"],
+            answer: 2
+        },
+        {
+            q: "How is a singly linked list different from a doubly linked list?",
+            options: ["It uses more memory", "It can be traversed in both directions", "Each node has only one pointer", "It is stored in arrays"],
+            answer: 2
+        },
+        {
+            q: "What is the time complexity for searching an element in a singly linked list (worst case)?",
+            options: ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+            answer: 2
+        }
+    ];
+
+    const mediumQuestions = [
+        {
+            q: "Which of the following is true about a singly linked list?",
+            options: ["It can be circular", "It always has a tail pointer", "It allows random access", "It stores data in contiguous memory"],
+            answer: 0
+        },
+        {
+            q: "Which of the following is necessary to delete a node from the middle of a singly linked list?",
+            options: ["Pointer to previous node", "Pointer to next node", "Head pointer only", "Value of last node"],
+            answer: 0
+        },
+        {
+            q: "If a singly linked list has n nodes, how many next pointers are there?",
+            options: ["n", "n - 1", "n + 1", "n/2"],
+            answer: 0
+        },
+        {
+            q: "Which data structure is ideal for implementing a stack?",
+            options: ["Queue", "Doubly linked list", "Singly linked list", "Array"],
+            answer: 2
+        },
+        {
+            q: "What will happen if the head of the singly linked list is NULL?",
+            options: ["It shows the list is circular", "List has one element", "The list is empty", "Head points to tail"],
+            answer: 2
+        },
+        {
+            q: "How many pointers need to be changed to insert a node after a given node in a singly linked list?",
+            options: ["1", "2", "3", "0"],
+            answer: 1
+        },
+        {
+            q: "Which of the following traverses a singly linked list correctly?",
+            options: ["while(node->prev != NULL)", "while(node->next != NULL)", "while(node != NULL)", "for(node = NULL; node; node++)"],
+            answer: 2
+        },
+        {
+            q: "What is the key difference when deleting the last node in a singly linked list compared to deleting the first?",
+            options: ["Last node deletion needs no traversal", "Head pointer must be updated", "Previous node must be tracked", "It can be done in constant time"],
+            answer: 2
+        },
+        {
+            q: "In a function that prints a singly linked list recursively, what is the base condition?",
+            options: ["When head->next is NULL", "When data is 0", "When head is NULL", "When head->data is NULL"],
+            answer: 2
+        },
+        {
+            q: "Why are singly linked lists preferred over arrays in insertion operations?",
+            options: ["Random access is easier", "Less memory", "No need to shift elements", "Sorting is easier"],
+            answer: 2
+        }
+    ];
+
+    const hardQuestions = [
+        {
+            q: "What is the minimum number of pointers needed to reverse a singly linked list iteratively?",
+            options: ["1", "2", "3", "4"],
+            answer: 2
+        },
+        {
+            q: "What will be the output of traversing a corrupted singly linked list with a cycle?",
+            options: ["Segmentation fault", "Infinite loop", "NULL output", "Runtime error"],
+            answer: 1
+        },
+        {
+            q: "What is the best way to detect a loop in a singly linked list?",
+            options: ["Count the number of nodes", "Use a visited flag in each node", "Use two pointers (slow and fast)", "Reverse the list and check"],
+            answer: 2
+        },
+        {
+            q: "In a singly linked list of n nodes, what is the time complexity to delete the node before the last node?",
+            options: ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+            answer: 2
+        },
+        {
+            q: "Which algorithm is used to reverse a singly linked list in-place?",
+            options: ["Depth-First Search", "Floyd's Cycle Detection", "Pointer manipulation", "Dynamic Programming"],
+            answer: 2
+        },
+        {
+            q: "What does this code snippet do?\nwhile(head) {\n  head = head->next;\n  count++;\n}",
+            options: ["Deletes the list", "Counts the number of nodes", "Finds the middle node", "Detects a loop"],
+            answer: 1
+        },
+        {
+            q: "Why is tail pointer sometimes maintained in a singly linked list?",
+            options: ["For efficient backward traversal", "To make sorting easier", "For O(1) insertion at end", "To reduce memory"],
+            answer: 2
+        },
+        {
+            q: "What will happen if we access `head->next->next` without checking for NULL?",
+            options: ["Compile-time error", "Logical error", "Segmentation fault / crash", "Output is always NULL"],
+            answer: 2
+        },
+        {
+            q: "In a recursive function to reverse a singly linked list, where should the reversing logic be applied?",
+            options: ["Before recursive call", "After base case", "After recursive call", "Before base case"],
+            answer: 2
+        },
+        {
+            q: "What does the below function return?\nint length(struct Node* head) {\n  return head ? 1 + length(head->next) : 0;\n}",
+            options: ["0", "Length of list", "Reversed list", "Address of last node"],
+            answer: 1
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = null;
+    let quizCompleted = false;
+    let currentLevel = 'easy';
+
+    // Get level from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = urlParams.get('level');
+    if (level) {
+        currentLevel = level;
+        document.getElementById('quizTitle').textContent = `Singly Linked List Quiz - ${level.charAt(0).toUpperCase() + level.slice(1)} Level`;
+    }
+
+    function getCurrentQuestions() {
+        switch(currentLevel) {
+            case 'medium':
+                return mediumQuestions;
+            case 'hard':
+                return hardQuestions;
+            default:
+                return easyQuestions;
+        }
+    }
+
+    function loadQuestion() {
+        const questions = getCurrentQuestions();
+        const question = questions[currentQuestion];
+        document.getElementById('quiz').innerHTML = `
+            <div class="score">Score: ${score}/10</div>
+            <div class="question">${currentQuestion + 1}. ${question.q}</div>
+            <div class="options">
+                ${question.options.map((option, index) => `
+                    <button class="option-btn" onclick="selectOption(${index})">${option}</button>
+                `).join('')}
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <button class="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        `;
+    }
+
+    function selectOption(index) {
+        if (quizCompleted) return;
+        
+        const questions = getCurrentQuestions();
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(button => button.classList.remove('selected'));
+        buttons[index].classList.add('selected');
+        
+        selectedOption = index;
+        const correct = index === questions[currentQuestion].answer;
+        
+        buttons.forEach(button => {
+            button.disabled = true;
+            const buttonIndex = Array.from(buttons).indexOf(button);
+            if (buttonIndex === questions[currentQuestion].answer) {
+                button.classList.add('correct');
+            } else if (buttonIndex === index && !correct) {
+                button.classList.add('incorrect');
+            }
+        });
+
+        if (correct) {
+            score++;
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Correct!</span>';
+        } else {
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Incorrect!</span>';
+        }
+        
+        document.querySelector('.next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        selectedOption = null;
+        
+        const questions = getCurrentQuestions();
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizCompleted = true;
+        const questions = getCurrentQuestions();
+        const percentage = (score / questions.length) * 100;
+        
+        let resultsHtml = '';
+
+        if (score >= 7) {
+            let nextButtonText = '';
+            let nextButtonLink = '';
+
+            if (currentLevel === 'easy') {
+                nextButtonText = 'Next Level &rarr;';
+                nextButtonLink = 'quizsingly.html?level=medium';
+            } else if (currentLevel === 'medium') {
+                nextButtonText = 'Next Level &rarr;';
+                nextButtonLink = 'quizsingly.html?level=hard';
+            } else if (currentLevel === 'hard') {
+                nextButtonText = 'Back to Quiz Menu';
+                nextButtonLink = 'quiz.html';
+            }
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level Complete!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+                <div class="next-level-container show">
+                    <button class="next-level-btn" onclick="window.location.href='${nextButtonLink}'">${nextButtonText}</button>
+                </div>
+            `;
+        } else {
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level - Try Again!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+            `;
+        }
+
+        document.getElementById('quiz').innerHTML = `
+            ${resultsHtml}
+            ${score < 7 ? '<button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>' : ''}
+        `;
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = null;
+        quizCompleted = false;
+        loadQuestion();
+    }
+
+    // Initialize quiz
+    loadQuestion();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header-section">
+        <h1 class="animate__animated animate__fadeInDown">DS Visualizer</h1>
+        <p class="subtitle animate__animated animate__fadeIn">Learn Data Structures Through Interactive Visualization</p>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="container">
+        <!-- Data Structures Information -->
+        <section class="ds-info-section">
+            <div class="ds-card">
+                <h3>Arrays</h3>
+                <a href="array.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Singly Linked List</h3>
+                <a href="singlylinkedlist.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Doubly Linked List</h3>
+                <a href="doublylinkedlist.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Trees</h3>
+                <a href="tree.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Stacks</h3>
+                <a href="stack.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Queues</h3>
+                <a href="queue.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Hashing</h3>
+                <a href="hashing.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Heap</h3>
+                <a href="heap.html" class="learn-more-btn">Learn It</a>
+            </div>
+
+            <div class="ds-card">
+                <h3>Quiz</h3>
+                <a href="quiz.html" class="learn-more-btn">Test Yourself</a>
+            </div>
+        </section>
+
+        <!-- Let's Play Button -->
+        <div class="text-center mt-5">
+            <a href="games.html" id="learnBtn" class="btn btn-primary btn-lg animate__animated animate__pulse animate__infinite" style="font-size: 4rem; padding: 1rem 2rem;">
+                Let's Play
+            </a>
+        </div>
+    </main>
+
+    <!-- Data Structure Detail Pages -->
+    <div id="arrayPage" class="detail-page hidden">
+        <div class="container">
+            <button class="back-btn">← Back</button>
+            <h2>Arrays</h2>
+            <div class="visualization-container">
+                <!-- Array visualization will be added here -->
+            </div>
+            <div class="info-section">
+                <h3>What is an Array?</h3>
+                <p>An array is a linear data structure that stores elements of the same type in contiguous memory locations.</p>
+                <h3>Key Operations</h3>
+                <ul>
+                    <li>Access: O(1)</li>
+                    <li>Search: O(n)</li>
+                    <li>Insertion: O(n)</li>
+                    <li>Deletion: O(n)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="linkedlistPage" class="detail-page hidden">
+        <div class="container">
+            <button class="back-btn">← Back</button>
+            <h2>Linked Lists</h2>
+            <div class="visualization-container">
+                <!-- Linked List visualization will be added here -->
+            </div>
+            <div class="info-section">
+                <h3>What is a Linked List?</h3>
+                <p>A linked list is a linear data structure where elements are stored in nodes, and each node points to the next node.</p>
+                <h3>Key Operations</h3>
+                <ul>
+                    <li>Access: O(n)</li>
+                    <li>Search: O(n)</li>
+                    <li>Insertion: O(1)</li>
+                    <li>Deletion: O(1)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="treePage" class="detail-page hidden">
+        <div class="container">
+            <button class="back-btn">← Back</button>
+            <h2>Trees</h2>
+            <div class="visualization-container">
+                <!-- Tree visualization will be added here -->
+            </div>
+            <div class="info-section">
+                <h3>What is a Tree?</h3>
+                <p>A tree is a hierarchical data structure consisting of nodes connected by edges.</p>
+                <h3>Key Operations</h3>
+                <ul>
+                    <li>Search: O(log n)</li>
+                    <li>Insertion: O(log n)</li>
+                    <li>Deletion: O(log n)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="stackqueuePage" class="detail-page hidden">
+        <div class="container">
+            <button class="back-btn">← Back</button>
+            <h2>Stacks & Queues</h2>
+            <div class="visualization-container">
+                <!-- Stack & Queue visualization will be added here -->
+            </div>
+            <div class="info-section">
+                <h3>What are Stacks & Queues?</h3>
+                <p>Stacks and Queues are linear data structures that follow LIFO and FIFO principles respectively.</p>
+                <h3>Key Operations</h3>
+                <ul>
+                    <li>Push/Pop (Stack): O(1)</li>
+                    <li>Enqueue/Dequeue (Queue): O(1)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubly Linked List Game</title>
+    <style>
+        :root {
+            --primary-blue: #A7C7E7;
+            --secondary-blue: #B5D8EB;
+            --accent-blue: #C5E1E5;
+            --light-blue: #E0F7FF;
+            --dark-blue: #2C5282;
+            --success-green: #4CAF50;
+            --error-red: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-blue);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--dark-blue);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 15px 20px;
+            border: 3px solid var(--primary-blue);
+            border-radius: 10px;
+            width: 200px;
+            font-size: 1.2rem;
+        }
+
+        .input-hint {
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 15px 30px;
+            background-color: var(--secondary-blue);
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--dark-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .linked-list-display {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+            min-height: 200px;
+            padding: 30px;
+            background-color: var(--light-blue);
+            border-radius: 15px;
+            margin: 20px 0;
+            position: relative;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .node {
+            display: flex;
+            align-items: center;
+            background-color: var(--accent-blue);
+            border: 3px solid var(--primary-blue);
+            border-radius: 10px;
+            padding: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .node-content {
+            background-color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark-blue);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .node-pointer {
+            width: 30px;
+            height: 3px;
+            background-color: var(--primary-blue);
+            position: relative;
+        }
+
+        .node-pointer::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            border-left: 8px solid var(--primary-blue);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        .node-pointer.reverse {
+            transform: rotate(180deg);
+        }
+
+        .node.highlight {
+            background-color: var(--dark-blue);
+            transform: scale(1.1);
+        }
+
+        .node.highlight .node-content {
+            color: white;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            transform: translateY(-20px);
+            opacity: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            min-height: 44px;
+        }
+
+        .message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .message.success {
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .message.error {
+            background-color: var(--error-red);
+            color: white;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--secondary-blue);
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+            background-color: var(--dark-blue);
+            color: white;
+        }
+
+        .mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary-blue);
+            color: var(--dark-blue);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .mute-button:hover {
+            transform: scale(1.1);
+            background-color: var(--dark-blue);
+            color: white;
+        }
+
+        .objective-panel {
+            background-color: var(--light-blue);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .objective-panel h3 {
+            color: var(--dark-blue);
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .objective-text {
+            font-size: 1.4rem;
+            color: var(--dark-blue);
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        @keyframes insertAnimation {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) rotate(10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes deleteAnimation {
+            0% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(-10deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        .node.insert {
+            animation: insertAnimation 0.5s ease-out;
+        }
+
+        .node.delete {
+            animation: deleteAnimation 0.5s ease-out;
+        }
+
+        .info-panel {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .info-panel h3 {
+            color: var(--dark-blue);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .info-panel p {
+            color: var(--dark-blue);
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back button -->
+        <a href="games.html" class="back-button" title="Back to Games">
+            ←
+        </a>
+
+        <!-- Mute button -->
+        <button id="muteButton" class="mute-button" title="Toggle Sound">
+            🔊
+        </button>
+
+        <h1>Doubly Linked List Game</h1>
+        <div class="objective-panel">
+            <h3>🎯 Current Objective</h3>
+            <div class="objective-text" id="objectiveText">Loading objective...</div>
+        </div>
+
+        
+        
+        <div class="game-area">
+            <div class="input-section">
+                <input type="text" id="valueInput" placeholder="Enter value" maxlength="4">
+                <input type="text" id="positionInput" placeholder="Enter position (optional)">
+                <button onclick="insertAtBeginning()">Insert at Start</button>
+                <button onclick="insertAtEnd()">Insert at End</button>
+                <button onclick="insertAtPosition()">Insert at Position</button>
+                <button onclick="deleteFromBeginning()">Delete from Start</button>
+                <button onclick="deleteFromEnd()">Delete from End</button>
+                <button onclick="deleteAtPosition()">Delete at Position</button>
+                <button onclick="searchElement()">Search</button>
+                <button onclick="updateElement()">Update</button>
+                <button onclick="reverseList()">Reverse</button>
+                <button onclick="clearList()">Clear</button>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <div class="linked-list-display" id="listDisplay"></div>
+
+            <div class="info-panel">
+                <h3>How to Play:</h3>
+                <p>1. Insert at Start: Add a node at the beginning of the list</p>
+                <p>2. Insert at End: Add a node at the end of the list</p>
+                <p>3. Insert at Position: Add a node at a specific position</p>
+                <p>4. Delete from Start: Remove the first node</p>
+                <p>5. Delete from End: Remove the last node</p>
+                <p>6. Delete at Position: Remove a node from a specific position</p>
+                <p>7. Search: Find a value in the list</p>
+                <p>8. Update: Change a value at a specific position</p>
+                <p>9. Reverse: Reverse the entire list</p>
+                <p>10. Clear: Remove all nodes from the list</p>
+                <div style="color: var(--dark-blue); font-size: 1.1rem; margin-top: 18px; text-align: center;">
+                    For Insert/Update: Enter value and optional position (e.g., "42" or "42,3")<br>
+                    For Delete/Search: Enter position (e.g., "3")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.next = null;
+                this.prev = null;
+            }
+        }
+
+        class DoublyLinkedList {
+            constructor() {
+                this.head = null;
+                this.tail = null;
+                this.size = 0;
+                this.currentObjective = 'insert';
+                this.completedObjectives = new Set();
+                this.updateObjectives();
+            }
+
+            updateObjectives() {
+                const objectiveText = document.getElementById('objectiveText');
+                objectiveText.textContent = this.getObjectiveText(this.currentObjective);
+            }
+
+            completeObjective(objective) {
+                if (objective === this.currentObjective) {
+                    this.completedObjectives.add(objective);
+                    const objectives = ['insert', 'delete', 'search', 'reverse'];
+                    const currentIndex = objectives.indexOf(objective);
+                    
+                    // Show success message for completing current objective
+                    showMessage(`Objective completed! 🎉`, 'success');
+                    
+                    if (currentIndex < objectives.length - 1) {
+                        // Wait for 2 seconds before showing next objective
+                        setTimeout(() => {
+                            this.currentObjective = objectives[currentIndex + 1];
+                            this.updateObjectives();
+                            showMessage(`New objective: ${this.getObjectiveText(this.currentObjective)}`, 'success');
+                        }, 2000);
+                    } else {
+                        // Wait for 2 seconds before showing congratulations
+                        setTimeout(() => {
+                            showMessage('Congratulations! You have completed all objectives! 🎉', 'success');
+                        }, 2000);
+                    }
+                }
+            }
+
+            getObjectiveText(objective) {
+                const objectives = {
+                    'insert': 'Insert nodes to build your doubly linked list',
+                    'delete': 'Delete nodes from the list',
+                    'search': 'Search for nodes in the list',
+                    'reverse': 'Reverse the entire list'
+                };
+                return objectives[objective];
+            }
+
+            insertAtBeginning(value) {
+                const newNode = new Node(value);
+                if (!this.head) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+                    newNode.next = this.head;
+                    this.head.prev = newNode;
+                    this.head = newNode;
+                }
+                this.size++;
+                if (this.currentObjective === 'insert') {
+                    this.completeObjective('insert');
+                }
+                return true;
+            }
+
+            insertAtEnd(value) {
+                const newNode = new Node(value);
+                if (!this.head) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+                    newNode.prev = this.tail;
+                    this.tail.next = newNode;
+                    this.tail = newNode;
+                }
+                this.size++;
+                if (this.currentObjective === 'insert') {
+                    this.completeObjective('insert');
+                }
+                return true;
+            }
+
+            insertAtPosition(value, position) {
+                if (position < 0 || position > this.size) return false;
+                if (position === 0) return this.insertAtBeginning(value);
+                if (position === this.size) return this.insertAtEnd(value);
+
+                const newNode = new Node(value);
+                let current = this.head;
+                for (let i = 0; i < position; i++) {
+                    current = current.next;
+                }
+
+                newNode.prev = current.prev;
+                newNode.next = current;
+                current.prev.next = newNode;
+                current.prev = newNode;
+                this.size++;
+                return true;
+            }
+
+            deleteFromBeginning() {
+                if (!this.head) return null;
+                const value = this.head.value;
+                this.head = this.head.next;
+                if (this.head) {
+                    this.head.prev = null;
+                } else {
+                    this.tail = null;
+                }
+                this.size--;
+                if (this.currentObjective === 'delete') {
+                    this.completeObjective('delete');
+                }
+                return value;
+            }
+
+            deleteFromEnd() {
+                if (!this.tail) return null;
+                const value = this.tail.value;
+                this.tail = this.tail.prev;
+                if (this.tail) {
+                    this.tail.next = null;
+                } else {
+                    this.head = null;
+                }
+                this.size--;
+                if (this.currentObjective === 'delete') {
+                    this.completeObjective('delete');
+                }
+                return value;
+            }
+
+            deleteAtPosition(position) {
+                if (position < 0 || position >= this.size) return null;
+                if (position === 0) return this.deleteFromBeginning();
+                if (position === this.size - 1) return this.deleteFromEnd();
+
+                let current = this.head;
+                for (let i = 0; i < position; i++) {
+                    current = current.next;
+                }
+
+                const value = current.value;
+                current.prev.next = current.next;
+                current.next.prev = current.prev;
+                this.size--;
+                return value;
+            }
+
+            search(value) {
+                let current = this.head;
+                let position = 0;
+                const nodes = document.querySelectorAll('.node');
+                
+                // Reset all nodes first
+                nodes.forEach(node => {
+                    node.classList.remove('highlight', 'success', 'error');
+                });
+
+                const searchAnimation = async () => {
+                    for (let i = 0; i < nodes.length; i++) {
+                        // Highlight current node
+                        nodes[i].classList.add('highlight');
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        if (current.value === value) {
+                            nodes[i].classList.remove('highlight');
+                            nodes[i].classList.add('success');
+                            showMessage(`Found ${value} at position ${i}!`, 'success');
+                            if (this.currentObjective === 'search') {
+                                this.completeObjective('search');
+                            }
+                            // Remove success highlight after 1 second
+                            setTimeout(() => {
+                                nodes[i].classList.remove('success');
+                            }, 1000);
+                            return position;
+                        }
+
+                        nodes[i].classList.remove('highlight');
+                        current = current.next;
+                        position++;
+                    }
+                    
+                    // If we get here, the value wasn't found
+                    showMessage(`${value} not found in the list`, 'error');
+                    return -1;
+                };
+
+                searchAnimation();
+            }
+
+            update(position, value) {
+                if (position < 0 || position >= this.size) return false;
+                let current = this.head;
+                for (let i = 0; i < position; i++) {
+                    current = current.next;
+                }
+                current.value = value;
+                return true;
+            }
+
+            reverse() {
+                let current = this.head;
+                let temp = null;
+                while (current) {
+                    temp = current.prev;
+                    current.prev = current.next;
+                    current.next = temp;
+                    current = current.prev;
+                }
+                if (temp) {
+                    this.tail = this.head;
+                    this.head = temp.prev;
+                }
+                if (this.currentObjective === 'reverse') {
+                    this.completeObjective('reverse');
+                }
+            }
+
+            clear() {
+                this.head = null;
+                this.tail = null;
+                this.size = 0;
+            }
+
+            toArray() {
+                const array = [];
+                let current = this.head;
+                while (current) {
+                    array.push(current.value);
+                    current = current.next;
+                }
+                return array;
+            }
+        }
+
+        const list = new DoublyLinkedList();
+        let isMuted = false;
+
+        // Initialize audio elements
+        const insertSound = new Audio('https://www.soundjay.com/buttons/sounds/button-09.mp3');
+        const deleteSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
+        const successSound = new Audio('https://www.soundjay.com/buttons/sounds/button-14.mp3');
+        const errorSound = new Audio('https://www.soundjay.com/buttons/sounds/button-15.mp3');
+
+        function playSound(sound) {
+            if (!isMuted) {
+                sound.currentTime = 0;
+                sound.play().catch(error => console.log('Audio play failed:', error));
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteButton = document.getElementById('muteButton');
+            muteButton.innerHTML = isMuted ? '🔇' : '🔊';
+        }
+
+        document.getElementById('muteButton').addEventListener('click', toggleMute);
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.classList.add('show');
+            
+            if (type === 'success') {
+                playSound(successSound);
+            } else if (type === 'error') {
+                playSound(errorSound);
+            }
+
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('listDisplay');
+            display.innerHTML = '';
+            
+            let current = list.head;
+            while (current) {
+                const nodeDiv = document.createElement('div');
+                nodeDiv.className = 'node';
+                nodeDiv.innerHTML = `
+                    <div class="node-pointer reverse"></div>
+                    <div class="node-content">${current.value}</div>
+                    <div class="node-pointer"></div>
+                `;
+                display.appendChild(nodeDiv);
+                current = current.next;
+            }
+        }
+
+        function insertAtBeginning() {
+            const value = document.getElementById('valueInput').value.trim();
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            if (value.length > 4) {
+                showMessage('Node value cannot exceed 4 characters', 'error');
+                return;
+            }
+            if (list.size >= 6) {
+                showMessage('Maximum 6 nodes allowed', 'error');
+                return;
+            }
+            if (list.insertAtBeginning(value)) {
+                playSound(insertSound);
+                updateDisplay();
+                showMessage(`Inserted ${value} at the beginning`, 'success');
+                document.getElementById('valueInput').value = '';
+            }
+        }
+
+        function insertAtEnd() {
+            const value = document.getElementById('valueInput').value.trim();
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            if (value.length > 4) {
+                showMessage('Node value cannot exceed 4 characters', 'error');
+                return;
+            }
+            if (list.size >= 6) {
+                showMessage('Maximum 6 nodes allowed', 'error');
+                return;
+            }
+            if (list.insertAtEnd(value)) {
+                playSound(insertSound);
+                updateDisplay();
+                showMessage(`Inserted ${value} at the end`, 'success');
+                document.getElementById('valueInput').value = '';
+            }
+        }
+
+        function insertAtPosition() {
+            const value = document.getElementById('valueInput').value.trim();
+            const position = parseInt(document.getElementById('positionInput').value);
+            
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            if (value.length > 4) {
+                showMessage('Node value cannot exceed 4 characters', 'error');
+                return;
+            }
+            if (list.size >= 6) {
+                showMessage('Maximum 6 nodes allowed', 'error');
+                return;
+            }
+            if (isNaN(position)) {
+                showMessage('Please enter a valid position', 'error');
+                return;
+            }
+            
+            if (list.insertAtPosition(value, position)) {
+                playSound(insertSound);
+                updateDisplay();
+                showMessage(`Inserted ${value} at position ${position}`, 'success');
+                document.getElementById('valueInput').value = '';
+                document.getElementById('positionInput').value = '';
+            } else {
+                showMessage('Invalid position', 'error');
+            }
+        }
+
+        function deleteFromBeginning() {
+            const value = list.deleteFromBeginning();
+            if (value !== null) {
+                playSound(deleteSound);
+                updateDisplay();
+                showMessage(`Deleted ${value} from the beginning`, 'success');
+            } else {
+                showMessage('List is empty', 'error');
+            }
+        }
+
+        function deleteFromEnd() {
+            const value = list.deleteFromEnd();
+            if (value !== null) {
+                playSound(deleteSound);
+                updateDisplay();
+                showMessage(`Deleted ${value} from the end`, 'success');
+            } else {
+                showMessage('List is empty', 'error');
+            }
+        }
+
+        function deleteAtPosition() {
+            const position = parseInt(document.getElementById('positionInput').value);
+            if (isNaN(position)) {
+                showMessage('Please enter a valid position', 'error');
+                return;
+            }
+            
+            const value = list.deleteAtPosition(position);
+            if (value !== null) {
+                playSound(deleteSound);
+                updateDisplay();
+                showMessage(`Deleted ${value} from position ${position}`, 'success');
+                document.getElementById('positionInput').value = '';
+            } else {
+                showMessage('Invalid position', 'error');
+            }
+        }
+
+        function searchElement() {
+            const value = document.getElementById('valueInput').value.trim();
+            if (!value) {
+                showMessage('Please enter a value to search', 'error');
+                return;
+            }
+            
+            list.search(value);
+            document.getElementById('valueInput').value = '';
+        }
+
+        function updateElement() {
+            const value = document.getElementById('valueInput').value.trim();
+            const position = parseInt(document.getElementById('positionInput').value);
+            
+            if (!value) {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+            if (isNaN(position)) {
+                showMessage('Please enter a valid position', 'error');
+                return;
+            }
+            
+            if (list.update(position, value)) {
+                updateDisplay();
+                showMessage(`Updated position ${position} to ${value}`, 'success');
+                document.getElementById('valueInput').value = '';
+                document.getElementById('positionInput').value = '';
+            } else {
+                showMessage('Invalid position', 'error');
+            }
+        }
+
+        function reverseList() {
+            if (list.size === 0) {
+                showMessage('List is empty', 'error');
+                return;
+            }
+            list.reverse();
+            updateDisplay();
+            showMessage('List reversed successfully', 'success');
+        }
+
+        function clearList() {
+            list.clear();
+            updateDisplay();
+            showMessage('List cleared', 'success');
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html> 

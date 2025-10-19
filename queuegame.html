@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queue Game - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #FFB6C1;    /* Light Pink */
+            --secondary-color: #FFC0CB;   /* Pink */
+            --tertiary-color: #FFD1DC;    /* Pale Pink */
+            --quaternary-color: #FFE4E1;   /* Misty Rose */
+            --text-color: #8B5A5A;        /* Dark Pink */
+            --background-color: #FFF0F5;   /* Lavender Blush */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .queue-type-selection {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .queue-type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(139, 90, 90, 0.2);
+        }
+
+        .queue-type-card.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            color: white;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn">←</a>
+
+    <div class="container">
+        <h1 class="text-center my-4">Queue Game</h1>
+        
+        <!-- Queue Type Selection -->
+        <div class="queue-type-selection">
+            <h3 class="mb-4">Choose a Queue Type</h3>
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="queue-type-card" onclick="window.location.href='simplequeue.html'">
+                        <h4>Simple Queue</h4>
+                        <p>Basic FIFO (First In First Out) queue with operations at one end</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card" onclick="window.location.href='circularqueue.html'">
+                        <h4>Circular Queue</h4>
+                        <p>Queue with circular structure for efficient memory usage</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card" onclick="window.location.href='doubleendedqueue.html'">
+                        <h4>Double Ended Queue</h4>
+                        <p>Queue with operations possible at both ends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Operations Game</title>
+    <style>
+        :root {
+            --primary-purple: #E0BBE4;
+            --secondary-purple: #957DAD;
+            --accent-purple: #D291BC;
+            --light-purple: #F3E5F5;
+            --dark-purple: #4A148C;
+            --success-green: #4CAF50;
+            --error-red: #f44336;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-purple);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--dark-purple);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            padding: 15px 20px;
+            border: 3px solid var(--primary-purple);
+            border-radius: 10px;
+            width: 200px;
+            font-size: 1.2rem;
+        }
+
+        .input-hint {
+            font-size: 1.1rem;
+            color: var(--dark-purple);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .operation-hint {
+            font-size: 1.1rem;
+            color: var(--dark-purple);
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        button {
+            padding: 15px 30px;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--dark-purple);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .array-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            min-height: 150px;
+            padding: 30px;
+            background-color: var(--light-purple);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .array-element {
+            width: 80px;
+            height: 80px;
+            background-color: var(--accent-purple);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border-radius: 10px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform-origin: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .array-element.highlight {
+            background-color: var(--dark-purple);
+            transform: scale(1.2) rotate(5deg);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .array-element.success {
+            background-color: var(--success-green);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .array-element.error {
+            background-color: var(--error-red);
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+        }
+
+        .array-element.insert {
+            animation: insertAnimation 0.5s ease-out;
+        }
+
+        .array-element.delete {
+            animation: deleteAnimation 0.5s ease-out;
+        }
+
+        @keyframes insertAnimation {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.3) rotate(10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes deleteAnimation {
+            0% {
+                transform: scale(1) rotate(0);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3) rotate(-10deg);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0) rotate(180deg);
+                opacity: 0;
+            }
+        }
+
+        .array-element::after {
+            content: attr(data-index);
+            position: absolute;
+            top: -25px;
+            font-size: 1rem;
+            color: var(--dark-purple);
+            font-weight: bold;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .info-panel {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: white;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--primary-purple);
+        }
+
+        .info-panel h3 {
+            color: var(--dark-purple);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .message {
+            margin-top: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            transform: translateY(-20px);
+            opacity: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .message.success {
+            background-color: var(--success-green);
+            color: white;
+        }
+
+        .message.error {
+            background-color: var(--error-red);
+            color: white;
+        }
+
+        .array-stats {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .objective-panel {
+            background-color: var(--light-purple);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .objective-panel h3 {
+            color: var(--dark-purple);
+            margin-top: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .objective-text {
+            font-size: 1.4rem;
+            color: var(--dark-purple);
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--secondary-purple);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+            background-color: var(--dark-purple);
+        }
+
+        .congrats-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--success-green);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            font-size: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: congratsAnimation 1s ease-out;
+            display: none;
+        }
+
+        @keyframes congratsAnimation {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent-purple);
+            animation: confettiFall 3s ease-in infinite;
+            z-index: 999;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Array Game</h1>
+        <!-- Add back button -->
+        <a href="games.html" class="back-button" title="Back to Games">
+            ←
+        </a>
+        <!-- Move objective panel to top -->
+        <div class="objective-panel">
+            <h3>🎯 Current Objective</h3>
+            <div class="objective-text" id="objectiveText">Loading objective...</div>
+        </div>
+
+        <!-- Fix mute button icon -->
+        <button id="muteButton" class="mute-button" title="Toggle Sound">
+            🔇
+        </button>
+
+        <!-- Update audio elements with more reliable sources -->
+        <audio id="insertSound1" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-09.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="insertSound2" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-10.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="insertSound3" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-11.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="deleteSound" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-16.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="successSound" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-14.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="errorSound" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-15.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="sortSound" preload="auto">
+            <source src="https://www.soundjay.com/buttons/sounds/button-12.mp3" type="audio/mpeg">
+        </audio>
+        
+        <div class="game-area">
+            <div class="input-section">
+                <input type="text" id="numberInput" placeholder="Enter number or A[i]" maxlength="5">
+                <button onclick="insertElement()" id="insertBtn">Insert</button>
+                <button onclick="deleteElement()" id="deleteBtn">Delete</button>
+                <button onclick="searchElement()" id="searchBtn">Search</button>
+                <button onclick="updateElement()" id="updateBtn">Update</button>
+                <button onclick="sortArray()" id="sortBtn">Sort</button>
+                <button onclick="clearArray()" id="clearBtn">Clear</button>
+            </div>
+            <div class="message" id="message"></div>
+            <div class="array-display" id="arrayDisplay"></div>
+            <div class="array-stats">
+                <p>Array Size: <span id="arraySize">0</span>/10</p>
+                <p>Current Elements: <span id="arrayElements">[]</span></p>
+            </div>
+            <div class="info-panel">
+                <h3>How to Play:</h3>
+                <p>1. Insert: Add a number to the array (max 10 elements)</p>
+                <p>2. Delete: Remove a number from the array</p>
+                <p>3. Search: Find a number in the array</p>
+                <p>4. Update: Change a number at a specific position</p>
+                <p>5. Sort: Arrange numbers in ascending order</p>
+                <p>6. Clear: Remove all numbers from the array</p>
+                <div class="input-hint" style="color: #4A148C; font-size: 1.2rem; margin-top: 2.5rem; margin-bottom: 0.5rem; font-family: inherit; text-align: center;">
+                    For Insert: Enter a number (e.g., 42)
+                </div>
+                <div class="operation-hint" style="color: #4A148C; font-size: 1.1rem; font-style: italic; margin-bottom: 2.5rem; text-align: center;">
+                    For Search/Delete: Enter the index number (e.g., 2)<br>
+                    For Update: Enter index and value separated by space (e.g., 2 10)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add congrats message -->
+    <div class="congrats-message" id="congratsMessage">
+        🎉 Congratulations! 🎉
+        <div id="congratsDetails"></div>
+    </div>
+
+    <script>
+        let array = [];
+        const MAX_SIZE = 10;
+        let lastDeletedIndex = -1;
+
+        function parseArrayNotation(input) {
+            // For update operation: "index value"
+            const updateMatch = input.match(/^(\d+)\s+(\S+)$/);
+            if (updateMatch) {
+                return { index: parseInt(updateMatch[1]), value: updateMatch[2] };
+            }
+            
+            // For search/delete operation: just the index
+            const indexMatch = input.match(/^(\d+)$/);
+            if (indexMatch) {
+                return { index: parseInt(indexMatch[1]), value: null };
+            }
+            
+            return null;
+        }
+
+        // Initialize audio elements and mute state
+        document.addEventListener('DOMContentLoaded', function() {
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.load();
+                audio.muted = isMuted; // Set initial mute state
+            });
+
+            // Add enter key functionality for insertion
+            const numberInput = document.getElementById('numberInput');
+            numberInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    insertElement();
+                }
+            });
+
+            // Set initial mute button state
+            muteButton.innerHTML = isMuted ? '🔇' : '🔊';
+        });
+
+        // Add mute functionality
+        let isMuted = false;
+        const muteButton = document.getElementById('muteButton');
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            muteButton.innerHTML = isMuted ? '🔇' : '🔊';
+            
+            // Update mute state for all audio elements
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.muted = isMuted;
+            });
+
+            // Store mute state in localStorage
+            localStorage.setItem('isMuted', isMuted);
+        }
+
+        // Load mute state from localStorage on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMuteState = localStorage.getItem('isMuted');
+            if (savedMuteState !== null) {
+                isMuted = savedMuteState === 'true';
+                muteButton.innerHTML = isMuted ? '🔇' : '🔊';
+                
+                // Apply mute state to all audio elements
+                const audioElements = document.querySelectorAll('audio');
+                audioElements.forEach(audio => {
+                    audio.muted = isMuted;
+                });
+            }
+        });
+
+        muteButton.addEventListener('click', toggleMute);
+
+        // Update playSound function to respect mute state
+        function playSound(soundId) {
+            if (isMuted) return;
+            
+            try {
+                const sound = document.getElementById(soundId);
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.muted = isMuted;
+                    const playPromise = sound.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Audio play failed:', error);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Error playing sound:', error);
+            }
+        }
+
+        // Update playInsertSound function to respect mute state
+        function playInsertSound() {
+            if (isMuted) return;
+            
+            try {
+                const sounds = ['insertSound1', 'insertSound2', 'insertSound3'];
+                const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+                const sound = document.getElementById(randomSound);
+                
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.muted = isMuted;
+                    const playPromise = sound.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log('Audio play failed:', error);
+                            // Fallback to a single sound if random selection fails
+                            const fallbackSound = document.getElementById('insertSound1');
+                            if (fallbackSound) {
+                                fallbackSound.currentTime = 0;
+                                fallbackSound.muted = isMuted;
+                                fallbackSound.play().catch(e => console.log('Fallback sound failed:', e));
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Error playing insert sound:', error);
+            }
+        }
+
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.classList.add('show');
+            
+            // Play appropriate sound
+            if (type === 'success') {
+                playSound('successSound');
+            } else if (type === 'error') {
+                playSound('errorSound');
+            }
+
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateStats() {
+            document.getElementById('arraySize').textContent = array.length;
+            document.getElementById('arrayElements').textContent = JSON.stringify(array);
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('arrayDisplay');
+            display.innerHTML = '';
+            
+            array.forEach((num, index) => {
+                const element = document.createElement('div');
+                element.className = 'array-element';
+                element.textContent = num;
+                element.setAttribute('data-index', index);
+                
+                // Add tooltip with value and index
+                element.title = `Index: ${index}\nValue: ${num}`;
+                
+                display.appendChild(element);
+            });
+
+            updateStats();
+        }
+
+        async function highlightElement(index, type = 'highlight') {
+            const element = document.getElementById('arrayDisplay').children[index];
+            if (!element) return;
+
+            element.classList.add(type);
+            
+            // Add a more pronounced animation for sorting
+            if (type === 'highlight') {
+                element.style.transform = 'scale(1.2) rotate(5deg)';
+                element.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            element.classList.remove(type);
+            element.style.transform = '';
+            element.style.boxShadow = '';
+        }
+
+        // Add objective system
+        const objectives = [
+            {
+                task: "Insert 3 numbers into the array",
+                check: () => array.length >= 3,
+                message: "Great job! You've added 3 numbers to the array!"
+            },
+            {
+                task: "Sort the array in ascending order",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 0; i < array.length - 1; i++) {
+                        if (Number(array[i]) > Number(array[i + 1])) return false;
+                    }
+                    return true;
+                },
+                message: "Excellent! The array is now perfectly sorted!"
+            },
+            {
+                task: "Update the first element to 100",
+                check: () => array.length > 0 && array[0] === "100",
+                message: "Perfect! You've updated the first element!"
+            },
+            {
+                task: "Delete the last element",
+                check: () => {
+                    return lastDeletedIndex === array.length;
+                },
+                message: "Well done! You've successfully deleted the last element!"
+            },
+            {
+                task: "Create an array with 5 elements",
+                check: () => array.length === 5,
+                message: "Amazing! You've created an array with exactly 5 elements!"
+            },
+            {
+                task: "Make the array contain only even numbers",
+                check: () => array.length > 0 && array.every(num => Number(num) % 2 === 0),
+                message: "Fantastic! All numbers in the array are now even!"
+            },
+            {
+                task: "Create a palindrome array (reads same forwards and backwards)",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 0; i < Math.floor(array.length / 2); i++) {
+                        if (array[i] !== array[array.length - 1 - i]) return false;
+                    }
+                    return true;
+                },
+                message: "Brilliant! You've created a perfect palindrome array!"
+            },
+            {
+                task: "Create an array with numbers in descending order",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 0; i < array.length - 1; i++) {
+                        if (Number(array[i]) < Number(array[i + 1])) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! The array is now in perfect descending order!"
+            },
+            {
+                task: "Create an array with alternating even and odd numbers",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 0; i < array.length - 1; i++) {
+                        const current = Number(array[i]) % 2;
+                        const next = Number(array[i + 1]) % 2;
+                        if (current === next) return false;
+                    }
+                    return true;
+                },
+                message: "Impressive! You've created a perfect alternating pattern!"
+            },
+            {
+                task: "Create an array with sum of adjacent elements equal to 10",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 0; i < array.length - 1; i++) {
+                        if (Number(array[i]) + Number(array[i + 1]) !== 10) return false;
+                    }
+                    return true;
+                },
+                message: "Genius! All adjacent pairs sum to 10!"
+            },
+            {
+                task: "Create an array with 3 elements and their sum is 15",
+                check: () => {
+                    if (array.length !== 3) return false;
+                    const sum = array.reduce((acc, curr) => acc + Number(curr), 0);
+                    return sum === 15;
+                },
+                message: "Perfect! You've created an array with 3 elements summing to 15!"
+            },
+            {
+                task: "Create an array with all elements being multiples of 5",
+                check: () => array.length > 0 && array.every(num => Number(num) % 5 === 0),
+                message: "Excellent! All numbers are now multiples of 5!"
+            },
+            {
+                task: "Create an array with no duplicate elements",
+                check: () => {
+                    const uniqueElements = new Set(array);
+                    return uniqueElements.size === array.length;
+                },
+                message: "Great job! Your array has all unique elements!"
+            },
+            {
+                task: "Create an array with elements in arithmetic sequence (difference of 3)",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 1; i < array.length; i++) {
+                        if (Number(array[i]) - Number(array[i-1]) !== 3) return false;
+                    }
+                    return true;
+                },
+                message: "Brilliant! You've created a perfect arithmetic sequence!"
+            },
+            {
+                task: "Create an array with elements in geometric sequence (ratio of 2)",
+                check: () => {
+                    if (array.length < 2) return false;
+                    for (let i = 1; i < array.length; i++) {
+                        if (Number(array[i]) / Number(array[i-1]) !== 2) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! You've created a perfect geometric sequence!"
+            }
+        ];
+
+        let currentObjectiveIndex = 0;
+
+        function updateObjective() {
+            const objectiveText = document.getElementById('objectiveText');
+            objectiveText.textContent = objectives[currentObjectiveIndex].task;
+        }
+
+        function showCongrats() {
+            const congratsMessage = document.getElementById('congratsMessage');
+            const congratsDetails = document.getElementById('congratsDetails');
+            
+            congratsDetails.textContent = objectives[currentObjectiveIndex].message;
+            congratsMessage.style.display = 'block';
+            
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                createConfetti();
+            }
+
+            // Play success sound
+            if (!isMuted) {
+                playSound('successSound');
+            }
+
+            // Hide congrats after 3 seconds
+            setTimeout(() => {
+                congratsMessage.style.display = 'none';
+                // Move to next objective
+                currentObjectiveIndex = (currentObjectiveIndex + 1) % objectives.length;
+                updateObjective();
+            }, 3000);
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(confetti);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                confetti.remove();
+            }, 3000);
+        }
+
+        function insertElement() {
+            const input = document.getElementById('numberInput');
+            const value = input.value.trim();
+            
+            if (value === '') {
+                showMessage('Please enter a value', 'error');
+                return;
+            }
+
+            if (array.length >= MAX_SIZE) {
+                showMessage('Array is full! Maximum size is 10', 'error');
+                return;
+            }
+
+            array.push(value);
+            updateDisplay();
+            
+            setTimeout(() => {
+                playInsertSound();
+            }, 100);
+            
+            const newElement = document.getElementById('arrayDisplay').lastElementChild;
+            newElement.classList.add('insert');
+            setTimeout(() => newElement.classList.remove('insert'), 500);
+
+            showMessage(`Inserted "${value}" at A[${array.length - 1}]`, 'success');
+            input.value = '';
+
+            // Check objective
+            if (objectives[currentObjectiveIndex].check()) {
+                showCongrats();
+            }
+        }
+
+        async function deleteElement() {
+            const input = document.getElementById('numberInput');
+            const parsed = parseArrayNotation(input.value);
+            
+            if (!parsed) {
+                showMessage('Please enter a valid index number', 'error');
+                return;
+            }
+
+            if (parsed.index >= array.length) {
+                showMessage(`Index ${parsed.index} is out of bounds`, 'error');
+                return;
+            }
+
+            const element = document.getElementById('arrayDisplay').children[parsed.index];
+            element.classList.add('delete');
+            playSound('deleteSound');
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const deletedValue = array[parsed.index];
+            array.splice(parsed.index, 1);
+            lastDeletedIndex = parsed.index;
+            updateDisplay();
+            showMessage(`Deleted element at index ${parsed.index} (value: "${deletedValue}")`, 'success');
+            input.value = '';
+
+            // Check objective
+            if (objectives[currentObjectiveIndex].check()) {
+                showCongrats();
+            }
+        }
+
+        async function searchElement() {
+            const input = document.getElementById('numberInput');
+            const parsed = parseArrayNotation(input.value);
+            
+            if (!parsed) {
+                showMessage('Please enter a valid index number', 'error');
+                return;
+            }
+
+            if (parsed.index >= array.length) {
+                showMessage(`Index ${parsed.index} is out of bounds`, 'error');
+                return;
+            }
+
+            await highlightElement(parsed.index, 'success');
+            showMessage(`Element at index ${parsed.index} = "${array[parsed.index]}"`, 'success');
+            input.value = '';
+        }
+
+        async function updateElement() {
+            const input = document.getElementById('numberInput');
+            const parsed = parseArrayNotation(input.value);
+            
+            if (!parsed || parsed.value === null) {
+                showMessage('Please use format: index value (e.g., 2 10)', 'error');
+                return;
+            }
+
+            if (parsed.index >= array.length) {
+                showMessage(`Index ${parsed.index} is out of bounds`, 'error');
+                return;
+            }
+
+            const oldValue = array[parsed.index];
+            await highlightElement(parsed.index, 'highlight');
+            array[parsed.index] = parsed.value;
+            updateDisplay();
+            showMessage(`Updated element at index ${parsed.index} from "${oldValue}" to "${parsed.value}"`, 'success');
+            input.value = '';
+
+            // Check objective
+            if (objectives[currentObjectiveIndex].check()) {
+                showCongrats();
+            }
+        }
+
+        async function sortArray() {
+            if (array.length === 0) {
+                showMessage('Array is empty', 'error');
+                return;
+            }
+
+            if (isMuted) return;
+            playSound('sortSound');
+
+            const isNumeric = array.every(item => !isNaN(item));
+            
+            for (let i = 0; i < array.length - 1; i++) {
+                for (let j = 0; j < array.length - i - 1; j++) {
+                    let shouldSwap = false;
+                    if (isNumeric) {
+                        shouldSwap = Number(array[j]) > Number(array[j + 1]);
+                    } else {
+                        shouldSwap = String(array[j]).localeCompare(String(array[j + 1])) > 0;
+                    }
+
+                    if (shouldSwap) {
+                        await highlightElement(j, 'highlight');
+                        await highlightElement(j + 1, 'highlight');
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        updateDisplay();
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+            }
+
+            for (let i = 0; i < array.length; i++) {
+                await highlightElement(i, 'success');
+            }
+
+            showMessage(`Array sorted ${isNumeric ? 'numerically' : 'alphabetically'}`, 'success');
+
+            // Check objective
+            if (objectives[currentObjectiveIndex].check()) {
+                showCongrats();
+            }
+        }
+
+        function clearArray() {
+            array = [];
+            updateDisplay();
+            showMessage('Array cleared', 'success');
+        }
+
+        // Initialize display
+        updateDisplay();
+
+        // Initialize objective
+        updateObjective();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linked List Visualization - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="detail-page visible">
+        <div class="container">
+            <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+            <h2>Linked List Visualization</h2>
+            
+            <div class="visualization-container">
+                <div class="linkedlist-container">
+                    <div class="linkedlist-elements" id="linkedListElements">
+                        <!-- Linked list nodes will be added here dynamically -->
+                    </div>
+                </div>
+                <div class="controls mt-4">
+                    <button class="btn btn-primary" id="addNode">Add Node</button>
+                    <button class="btn btn-primary" id="deleteNode">Delete Node</button>
+                    <button class="btn btn-primary" id="searchNode">Search Node</button>
+                    <button class="btn btn-primary" id="reverseList">Reverse List</button>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>What is a Linked List?</h3>
+                <p>A linked list is a linear data structure where elements are stored in nodes, and each node points to the next node in the sequence. Unlike arrays, linked lists don't require contiguous memory allocation.</p>
+                
+                <h3>Key Characteristics</h3>
+                <ul>
+                    <li>Dynamic size</li>
+                    <li>Non-contiguous memory allocation</li>
+                    <li>Each node contains data and a pointer</li>
+                    <li>No random access</li>
+                </ul>
+
+                <h3>Time Complexity</h3>
+                <ul>
+                    <li>Access: O(n) - Need to traverse from start</li>
+                    <li>Search: O(n) - Need to traverse through nodes</li>
+                    <li>Insertion: O(1) - If position is known</li>
+                    <li>Deletion: O(1) - If position is known</li>
+                </ul>
+
+                <h3>Types of Linked Lists</h3>
+                <ul>
+                    <li>Singly Linked List: Each node points to next node</li>
+                    <li>Doubly Linked List: Each node points to both next and previous nodes</li>
+                    <li>Circular Linked List: Last node points to first node</li>
+                    <li>Circular Doubly Linked List: Combination of circular and doubly linked list</li>
+                </ul>
+
+                <h3>Common Operations</h3>
+                <ul>
+                    <li>Insertion: Add node at beginning, end, or specific position</li>
+                    <li>Deletion: Remove node from beginning, end, or specific position</li>
+                    <li>Traversal: Visit each node once</li>
+                    <li>Search: Find node with specific value</li>
+                    <li>Reverse: Change direction of links</li>
+                </ul>
+
+                <h3>Applications</h3>
+                <ul>
+                    <li>Implementation of stacks and queues</li>
+                    <li>Undo functionality in software</li>
+                    <li>Browser history</li>
+                    <li>Music player playlist</li>
+                    <li>Image viewer</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="linkedlist.js"></script>
+</body>
+</html> 

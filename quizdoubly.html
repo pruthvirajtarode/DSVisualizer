@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubly Linked List Quiz - Easy Level</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 700px;
+            width: 95vw;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: #2d6a4f;
+            text-align: center;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .options {
+            margin-bottom: 1.2rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+            padding: 0.8rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 12px;
+            border: 2px solid #e3f6e5;
+            background: #f6fffa;
+            color: #217a36;
+            font-weight: 500;
+            text-align: left;
+            transition: background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .option-btn.selected {
+            background: #cbe9d7;
+            border: 2px solid #88d8b0;
+            color: #145c2c;
+        }
+        .option-btn.correct {
+            background: #a8e6cf;
+            border: 2px solid #2ecc40;
+            color: #217a36;
+        }
+        .option-btn.incorrect {
+            background: #ffb3b3;
+            border: 2px solid #ff8b8b;
+            color: #b91c1c;
+        }
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .next-btn, .restart-btn {
+            display: inline-block;
+            padding: 0.7rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .next-btn:hover, .restart-btn:hover {
+            background: linear-gradient(90deg, #cbe9d7 0%, #e3f6e5 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .final-score, .next-level-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #217a36;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .next-level-container {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s, transform 0.7s;
+            margin-top: 2.5rem;
+        }
+        .next-level-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .next-level-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 16px rgba(139, 115, 85, 0.08);
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInBtn 1s 0.7s forwards;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 id="quizTitle">Doubly Linked List Quiz - Easy Level</h1>
+        <div id="quiz"></div>
+    </div>
+    <script>
+    const easyQuestions = [
+        {
+            q: "What does a node in a doubly linked list contain?",
+            options: ["Only data", "Data and one pointer", "Data and two pointers", "Only pointers"],
+            answer: 2
+        },
+        {
+            q: "What is the pointer in the last node of a doubly linked list set to?",
+            options: ["Head", "NULL", "Address of previous node", "Random address"],
+            answer: 1
+        },
+        {
+            q: "Which of the following is TRUE for a doubly linked list?",
+            options: ["Can only be traversed forward", "Has only one link field", "Can be traversed both forward and backward", "Only used in stacks"],
+            answer: 2
+        },
+        {
+            q: "In a DLL, what does the previous pointer of the head node point to?",
+            options: ["Head itself", "NULL", "Tail node", "Random address"],
+            answer: 1
+        },
+        {
+            q: "What is the time complexity to insert at the beginning of a DLL?",
+            options: ["O(n)", "O(log n)", "O(1)", "O(n log n)"],
+            answer: 2
+        },
+        {
+            q: "What is the correct condition to identify an empty doubly linked list?",
+            options: ["Head == NULL", "Tail == NULL", "Head->next == NULL", "Prev pointer is NULL"],
+            answer: 0
+        },
+        {
+            q: "What is the head of a doubly linked list?",
+            options: ["First node", "Last node", "Middle node", "None"],
+            answer: 0
+        },
+        {
+            q: "What is the time complexity of deleting the last node in a DLL (if tail is given)?",
+            options: ["O(1)", "O(n)", "O(n log n)", "O(log n)"],
+            answer: 0
+        },
+        {
+            q: "Can a doubly linked list be circular?",
+            options: ["No", "Yes", "Only if size is > 2", "Only in arrays"],
+            answer: 1
+        },
+        {
+            q: "What is the default value of next and prev pointer when a node is created in DLL?",
+            options: ["0", "NULL", "1", "Depends on language"],
+            answer: 1
+        }
+    ];
+
+    const mediumQuestions = [
+        {
+            q: "Which operation is more efficient in DLL than in SLL?",
+            options: ["Insertion at beginning", "Searching", "Traversing forward", "Reversing"],
+            answer: 0
+        },
+        {
+            q: "How to delete the tail node in a doubly linked list (tail is not directly given)?",
+            options: ["Traverse to last node, change prev->next to NULL", "Head = NULL", "tail = tail->next", "prev pointer not required"],
+            answer: 0
+        },
+        {
+            q: "If a DLL has n nodes, how many NULLs exist in the list?",
+            options: ["0", "1", "2", "n"],
+            answer: 2
+        },
+        {
+            q: "What happens during reversing of a DLL?",
+            options: ["Traverse and delete all nodes", "Swap next and prev pointers for each node and update head", "Make all next = NULL", "Move tail to head without changes"],
+            answer: 1
+        },
+        {
+            q: "Which traversal takes more time in DLL?",
+            options: ["Forward", "Backward", "Both same", "Depends on implementation"],
+            answer: 2
+        },
+        {
+            q: "What is the minimum number of pointer changes needed to insert a node between two nodes in DLL?",
+            options: ["1", "2", "3", "4"],
+            answer: 2
+        },
+        {
+            q: "Why is DLL preferred over SLL in some applications?",
+            options: ["Less memory usage", "Easier backtracking", "Faster search", "Simpler implementation"],
+            answer: 1
+        },
+        {
+            q: "Which application is ideal for using DLL?",
+            options: ["Polynomial addition", "Undo feature in editor", "Hashing", "Stack implementation"],
+            answer: 1
+        },
+        {
+            q: "Which of these errors can occur if prev pointer is not updated correctly in DLL deletion?",
+            options: ["Segmentation fault", "Memory leak", "Broken link", "All of the above"],
+            answer: 3
+        },
+        {
+            q: "When inserting a new node before the head in DLL, what must be updated?",
+            options: ["New node's next to head", "Head's prev to new node", "Head to new node", "All of the above"],
+            answer: 3
+        }
+    ];
+
+    const hardQuestions = [
+        {
+            q: "Which is the best way to check if a DLL is circular?",
+            options: ["Check if head->prev == tail", "Check if tail->next == head", "Traverse until pointer repeats", "All of the above"],
+            answer: 3
+        },
+        {
+            q: "What is the time complexity of searching an element in sorted DLL using binary search?",
+            options: ["O(log n)", "O(n)", "O(n log n)", "O(1)"],
+            answer: 1
+        },
+        {
+            q: "When converting SLL to DLL, how many pointers need to be added per node?",
+            options: ["0", "1", "2", "Depends on the language"],
+            answer: 1
+        },
+        {
+            q: "Which of these is most difficult to implement using DLL?",
+            options: ["LRU cache", "Deque", "Balanced BST", "Undo-redo system"],
+            answer: 2
+        },
+        {
+            q: "To delete all occurrences of a given key in DLL, what is the best approach?",
+            options: ["Traverse and check", "Use hash set", "Use recursion", "Cannot be done"],
+            answer: 0
+        },
+        {
+            q: "If a node in DLL is corrupted and both pointers are NULL, how does it affect the list?",
+            options: ["Breaks link", "Causes data loss", "Makes list unusable", "All of the above"],
+            answer: 3
+        },
+        {
+            q: "How do you detect a loop in a DLL?",
+            options: ["Hashing visited nodes", "Floyd's Cycle detection", "Mark visited with flags", "All of the above"],
+            answer: 3
+        },
+        {
+            q: "Which data structure is commonly used with DLL in real-life cache design?",
+            options: ["Array", "Stack", "Hash Map", "Queue"],
+            answer: 2
+        },
+        {
+            q: "Which of the following is not a practical benefit of DLL over SLL?",
+            options: ["Supports backward traversal", "Efficient insertion/deletion from both ends", "Requires less memory than SLL", "Used in implementing undo-redo"],
+            answer: 2
+        },
+        {
+            q: "What happens when a node is deleted but memory is not freed in DLL?",
+            options: ["Garbage collection", "Data corruption", "Memory leak", "Node reappears"],
+            answer: 2
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = null;
+    let quizCompleted = false;
+    let currentLevel = 'easy';
+
+    // Get level from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = urlParams.get('level');
+    if (level) {
+        currentLevel = level;
+        document.getElementById('quizTitle').textContent = `Doubly Linked List Quiz - ${level.charAt(0).toUpperCase() + level.slice(1)} Level`;
+    }
+
+    function getCurrentQuestions() {
+        switch(currentLevel) {
+            case 'medium':
+                return mediumQuestions;
+            case 'hard':
+                return hardQuestions;
+            default:
+                return easyQuestions;
+        }
+    }
+
+    function loadQuestion() {
+        const questions = getCurrentQuestions();
+        const question = questions[currentQuestion];
+        document.getElementById('quiz').innerHTML = `
+            <div class="score">Score: ${score}/10</div>
+            <div class="question">${currentQuestion + 1}. ${question.q}</div>
+            <div class="options">
+                ${question.options.map((option, index) => `
+                    <button class="option-btn" onclick="selectOption(${index})">${option}</button>
+                `).join('')}
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <button class="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        `;
+    }
+
+    function selectOption(index) {
+        if (quizCompleted) return;
+        
+        const questions = getCurrentQuestions();
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(button => button.classList.remove('selected'));
+        buttons[index].classList.add('selected');
+        
+        selectedOption = index;
+        const correct = index === questions[currentQuestion].answer;
+        
+        buttons.forEach(button => {
+            button.disabled = true;
+            const buttonIndex = Array.from(buttons).indexOf(button);
+            if (buttonIndex === questions[currentQuestion].answer) {
+                button.classList.add('correct');
+            } else if (buttonIndex === index && !correct) {
+                button.classList.add('incorrect');
+            }
+        });
+
+        if (correct) {
+            score++;
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Correct!</span>';
+        } else {
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Incorrect!</span>';
+        }
+        
+        document.querySelector('.next-btn').style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        selectedOption = null;
+        
+        const questions = getCurrentQuestions();
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizCompleted = true;
+        const questions = getCurrentQuestions();
+        const percentage = (score / questions.length) * 100;
+        
+        let resultsHtml = '';
+
+        if (score >= 7) {
+            let nextButtonText = '';
+            let nextButtonLink = '';
+
+            if (currentLevel === 'easy') {
+                nextButtonText = 'Next Level &rarr;';
+                nextButtonLink = 'quizdoubly.html?level=medium';
+            } else if (currentLevel === 'medium') {
+                nextButtonText = 'Next Level &rarr;';
+                nextButtonLink = 'quizdoubly.html?level=hard';
+            } else if (currentLevel === 'hard') {
+                nextButtonText = 'Back to Quiz Menu';
+                nextButtonLink = 'quiz.html';
+            }
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level Complete!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+                <div class="next-level-container show">
+                    <button class="next-level-btn" onclick="window.location.href='${nextButtonLink}'">${nextButtonText}</button>
+                </div>
+            `;
+        } else {
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level - Try Again!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+            `;
+        }
+
+        document.getElementById('quiz').innerHTML = `
+            ${resultsHtml}
+            ${score < 7 ? '<button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>' : ''}
+        `;
+    }
+
+    function restartQuiz() {
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = null;
+        quizCompleted = false;
+        loadQuestion();
+    }
+
+    // Initialize quiz
+    loadQuestion();
+    </script>
+</body>
+</html> 

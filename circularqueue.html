@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Queue - DS Visualizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FFB6C1;    /* Light Pink */
+            --secondary-color: #FFC0CB;   /* Pink */
+            --tertiary-color: #FFD1DC;    /* Pale Pink */
+            --quaternary-color: #FFE4E1;   /* Misty Rose */
+            --text-color: #8B5A5A;        /* Dark Pink */
+            --background-color: #FFF0F5;   /* Lavender Blush */
+            --light-purple: #F0E6FF;       /* Light Purple */
+            --dark-purple: #6A0DAD;        /* Dark Purple */
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem auto;
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+            border: 2px solid var(--primary-color);
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .circular-queue-container {
+            width: 400px;
+            height: 400px;
+            margin: 2rem auto;
+            position: relative;
+            background: var(--background-color);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px rgba(139, 90, 90, 0.1);
+            display: block !important;
+        }
+
+        .circular-queue-slot {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            font-size: 1.2rem;
+            transform: translate(-50%, -50%);
+        }
+
+        .circular-queue-slot.empty {
+            background: rgba(255, 182, 193, 0.3);
+            border: 2px dashed var(--primary-color);
+        }
+
+        .circular-queue-slot.front {
+            border: 3px solid #FF69B4;
+        }
+
+        .circular-queue-slot.rear {
+            box-shadow: 0 0 10px #FF69B4;
+        }
+
+        .position-indicator {
+            position: absolute;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+
+        .position-indicator.front {
+            background: linear-gradient(135deg, #FF69B4, var(--primary-color));
+        }
+
+        .position-indicator.rear {
+            background: linear-gradient(135deg, var(--primary-color), #FF69B4);
+        }
+
+        @keyframes enqueuePop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .circular-queue-slot.enqueue-anim {
+            animation: enqueuePop 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .queue-indicators {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .queue-label {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 15px;
+            padding: 6px 18px;
+            margin: 0 10px;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.15);
+        }
+
+        .queue-label.front {
+            background: linear-gradient(135deg, #FF69B4, var(--primary-color));
+        }
+
+        .queue-label.rear {
+            background: linear-gradient(135deg, var(--primary-color), #FF69B4);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            padding: 0 2rem;
+            align-items: center;
+        }
+
+        .controls .form-control {
+            width: 120px;
+            height: 38px;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .controls .btn-queue {
+            height: 38px;
+            padding: 0 1.5rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .btn-queue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.2);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            color: var(--text-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: var(--text-color);
+        }
+
+        .game-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .game-message.success {
+            background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+            color: #2E7D32;
+            display: block;
+        }
+
+        .game-message.error {
+            background: linear-gradient(135deg, #FFEBEE, #FFCDD2);
+            color: #C62828;
+            display: block;
+        }
+
+        .queue-info {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .queue-operations h4, .queue-properties h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .queue-operations ul, .queue-properties ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .queue-operations li, .queue-properties li {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            background: rgba(255, 182, 193, 0.1);
+            border-radius: 5px;
+            text-align: left;
+            padding-left: 1rem;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+        }
+
+        .instructions h4 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        .instructions li {
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+
+        .size-warning {
+            color: #C62828;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(139, 90, 90, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sound-control:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-control i {
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .sound-control.muted i::before {
+            content: "\f6a9";
+        }
+
+        .sound-control:not(.muted) i::before {
+            content: "\f028";
+        }
+
+        .queue-type-selection {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 0 2rem;
+        }
+
+        .queue-type-selection a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .queue-type-selection a:hover {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .queue-type-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(139, 90, 90, 0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            color: var(--text-color);
+        }
+
+        .queue-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(139, 90, 90, 0.2);
+        }
+
+        .queue-type-card.selected {
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            color: white;
+        }
+
+        .queue-type-card h4 {
+            margin-bottom: 1rem;
+            color: inherit;
+        }
+
+        .queue-type-card p {
+            margin-bottom: 0;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Add peek overlay styles */
+        .peek-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .peek-overlay.visible {
+            opacity: 1;
+        }
+
+        .peek-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+            border: 2px solid var(--primary-color);
+        }
+
+        .peek-overlay.visible .peek-content {
+            transform: scale(1);
+        }
+
+        .peek-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        /* Add/Update these styles */
+        .queue-size-input {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .queue-size-input .form-control {
+            width: 80px;
+            height: 38px;
+            text-align: center;
+            padding: 0.5rem;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .btn-queue {
+            width: 100px;
+            height: 38px;
+            padding: 0 1rem;
+            white-space: nowrap;
+            background: linear-gradient(135deg, var(--primary-color), var(--tertiary-color));
+            border: none;
+            color: var(--text-color);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .btn-queue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(139, 90, 90, 0.2);
+        }
+
+        .size-warning {
+            color: #C62828;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .level-objectives {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .level-objectives h4 {
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            text-align: center;
+        }
+
+        .level-objectives p {
+            margin-bottom: 0;
+            color: var(--text-color);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <a href="games.html" class="back-btn">←</a>
+    <button class="sound-control" id="soundControl" title="Toggle Sound">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <div class="container">
+        <h1 class="text-center my-4">Queue Game</h1>
+        
+        <!-- Queue Type Selection -->
+        <div class="queue-type-selection">
+            <h3 class="mb-4">Choose a Queue Type</h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <a href="simplequeue.html" class="text-decoration-none">
+                        <div class="queue-type-card">
+                            <h4>Simple Queue</h4>
+                            <p>Basic FIFO (First In First Out) queue with operations at one end</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <div class="queue-type-card selected">
+                        <h4>Circular Queue</h4>
+                        <p>Queue with circular structure for efficient memory usage</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <a href="doubleendedqueue.html" class="text-decoration-none">
+                        <div class="queue-type-card">
+                            <h4>Double Ended Queue</h4>
+                            <p>Queue with operations possible at both ends</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container">
+            <h2 class="text-center">Circular Queue</h2>
+
+            <!-- Add current objective section -->
+            <div class="level-objectives">
+                <h4>🎯 Current Objective:</h4>
+                <p id="circularQueueObjective" style="font-size: 1.2rem; font-weight: bold; font-family: 'Segoe UI Emoji', 'Segoe UI Symbol', 'Segoe UI', 'Apple Color Emoji', sans-serif;">Loading objective...</p>
+            </div>
+
+            <div id="gameMessage" class="game-message"></div>
+
+            <div class="queue-size-input text-center mb-3">
+                <input type="number" id="queueSizeInput" class="form-control" placeholder="Size" min="1" max="9" value="5">
+                <button class="btn-queue" onclick="setQueueSize()">Set Size</button>
+                <div class="size-warning" id="sizeWarning" style="display: none;">Please enter a size between 1 and 9</div>
+            </div>
+
+            <div class="circular-queue-container" id="circularQueue">
+                <!-- Circular slots will be added here dynamically -->
+            </div>
+
+            <div class="controls">
+                <input type="text" class="form-control" id="elementInput" placeholder="Enter value" maxlength="4">
+                <button class="btn-queue" onclick="enqueue()">Enqueue</button>
+                <button class="btn-queue" onclick="dequeue()">Dequeue</button>
+                <button class="btn-queue" onclick="peek()">Peek</button>
+            </div>
+
+            <div class="instructions">
+                <h4>How to use Circular Queue:</h4>
+                <ol>
+                    <li>First, set your desired queue size (2-8)</li>
+                    <li>Enter a value in the input field</li>
+                    <li>Click "Enqueue" to add the value to the queue</li>
+                    <li>Click "Dequeue" to remove the value from the front</li>
+                    <li>Click "Peek" to see the front element without removing it</li>
+                    <li>When full, you must dequeue before enqueueing new values</li>
+                </ol>
+            </div>
+
+            <div class="queue-info">
+                <div class="queue-operations">
+                    <h4>Circular Queue Operations:</h4>
+                    <ul>
+                        <li><strong>Enqueue:</strong> Adds an element to the rear of the queue</li>
+                        <li><strong>Dequeue:</strong> Removes an element from the front of the queue</li>
+                        <li><strong>Peek:</strong> Views the front element without removing it</li>
+                        <li><strong>isEmpty:</strong> Checks if the queue is empty</li>
+                        <li><strong>isFull:</strong> Checks if the queue is full</li>
+                    </ul>
+                </div>
+
+                <div class="queue-properties">
+                    <h4>Circular Queue Properties:</h4>
+                    <ul>
+                        <li>FIFO (First In First Out) structure</li>
+                        <li>Fixed size implementation</li>
+                        <li>Efficient memory usage through circular structure</li>
+                        <li>Front and rear pointers wrap around when reaching the end</li>
+                        <li>Prevents overflow by reusing empty spaces</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sound effect system
+        class SoundEffect {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.isMuted = false;
+                this.volume = 0.1;
+            }
+
+            toggleMute() {
+                this.isMuted = !this.isMuted;
+                return this.isMuted;
+            }
+
+            playSound(frequency, duration, type = 'sine') {
+                if (this.isMuted) return;
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.type = type;
+                oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                gainNode.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+                
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                oscillator.stop(this.audioContext.currentTime + duration);
+            }
+
+            playEnqueueSound() {
+                this.playSound(440, 0.3); // A4 note
+            }
+
+            playDequeueSound() {
+                this.playSound(330, 0.2); // E4 note
+            }
+
+            playPeekSound() {
+                this.playSound(523.25, 0.15); // C5 note
+            }
+
+            playErrorSound() {
+                this.playSound(220, 0.2, 'square'); // A3 note with square wave
+            }
+        }
+
+        // Initialize variables
+        let queue = [];
+        let front = 0;
+        let rear = -1;
+        let size = 0;
+        let MAX_SIZE = 8;
+        const soundEffect = new SoundEffect();
+        let usedObjectives = new Set();
+        let currentObjectiveIndex = -1;
+
+        // Add circular queue objectives
+        const circularQueueObjectives = [
+            {
+                task: "Enqueue {size} elements into the circular queue",
+                check: () => size === MAX_SIZE,
+                message: "Great job! You've filled the circular queue!"
+            },
+            {
+                task: "Fill the queue and then dequeue all elements",
+                check: () => size === 0 && usedObjectives.has(currentObjectiveIndex),
+                message: "Excellent! You've successfully emptied the queue!"
+            },
+            {
+                task: "Enqueue {size/2} elements, then dequeue them all",
+                check: () => size === 0 && usedObjectives.has(currentObjectiveIndex),
+                message: "Perfect! You've completed the half-fill and empty operation!"
+            },
+            {
+                task: "Fill the queue, dequeue 2 elements, then enqueue 2 more",
+                check: () => size === MAX_SIZE && usedObjectives.has(currentObjectiveIndex),
+                message: "Brilliant! You've mastered the circular nature of the queue!"
+            },
+            {
+                task: "Create a pattern of alternating even and odd numbers",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 0; i < size - 1; i++) {
+                        const current = Number(queue[(front + i) % MAX_SIZE]) % 2;
+                        const next = Number(queue[(front + i + 1) % MAX_SIZE]) % 2;
+                        if (current === next) return false;
+                    }
+                    return true;
+                },
+                message: "Impressive! You've created a perfect alternating pattern!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 3",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => Number(num) % 3 === 0),
+                message: "Excellent! All numbers are multiples of 3!"
+            },
+            {
+                task: "Create a queue with elements in ascending order",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 0; i < size - 1; i++) {
+                        if (Number(queue[(front + i) % MAX_SIZE]) > Number(queue[(front + i + 1) % MAX_SIZE])) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! The queue is in perfect ascending order!"
+            },
+            {
+                task: "Create a queue with elements in descending order",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 0; i < size - 1; i++) {
+                        if (Number(queue[(front + i) % MAX_SIZE]) < Number(queue[(front + i + 1) % MAX_SIZE])) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! The queue is in perfect descending order!"
+            },
+            {
+                task: "Create a queue with sum of adjacent elements equal to 10",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 0; i < size - 1; i++) {
+                        if (Number(queue[(front + i) % MAX_SIZE]) + Number(queue[(front + i + 1) % MAX_SIZE]) !== 10) return false;
+                    }
+                    return true;
+                },
+                message: "Genius! All adjacent pairs sum to 10!"
+            },
+            {
+                task: "Create a queue with all elements being perfect squares",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => Math.sqrt(Number(num)) % 1 === 0),
+                message: "Amazing! All numbers are perfect squares!"
+            },
+            {
+                task: "Create a queue with all elements being prime numbers",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => {
+                        const n = Number(num);
+                        if (n <= 1) return false;
+                        for (let i = 2; i <= Math.sqrt(n); i++) {
+                            if (n % i === 0) return false;
+                        }
+                        return true;
+                    }),
+                message: "Incredible! All numbers are prime!"
+            },
+            {
+                task: "Create a queue with elements in arithmetic sequence (difference of 3)",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 1; i < size; i++) {
+                        if (Number(queue[(front + i) % MAX_SIZE]) - Number(queue[(front + i - 1) % MAX_SIZE]) !== 3) return false;
+                    }
+                    return true;
+                },
+                message: "Brilliant! You've created a perfect arithmetic sequence!"
+            },
+            {
+                task: "Create a queue with elements in geometric sequence (ratio of 2)",
+                check: () => {
+                    if (size < 2) return false;
+                    for (let i = 1; i < size; i++) {
+                        if (Number(queue[(front + i) % MAX_SIZE]) / Number(queue[(front + i - 1) % MAX_SIZE]) !== 2) return false;
+                    }
+                    return true;
+                },
+                message: "Outstanding! You've created a perfect geometric sequence!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 5",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => Number(num) % 5 === 0),
+                message: "Excellent! All numbers are multiples of 5!"
+            },
+            {
+                task: "Create a queue with no duplicate elements",
+                check: () => {
+                    const elements = Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE]);
+                    return new Set(elements).size === elements.length;
+                },
+                message: "Great job! Your queue has all unique elements!"
+            },
+            {
+                task: "Create a queue with elements in Fibonacci sequence",
+                check: () => {
+                    if (size < 3) return false;
+                    for (let i = 2; i < size; i++) {
+                        const current = Number(queue[(front + i) % MAX_SIZE]);
+                        const prev1 = Number(queue[(front + i - 1) % MAX_SIZE]);
+                        const prev2 = Number(queue[(front + i - 2) % MAX_SIZE]);
+                        if (current !== prev1 + prev2) return false;
+                    }
+                    return true;
+                },
+                message: "Fantastic! You've created a Fibonacci sequence!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 4",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => Number(num) % 4 === 0),
+                message: "Excellent! All numbers are multiples of 4!"
+            },
+            {
+                task: "Create a queue with all elements being multiples of 7",
+                check: () => size > 0 && Array.from({length: size}, (_, i) => queue[(front + i) % MAX_SIZE])
+                    .every(num => Number(num) % 7 === 0),
+                message: "Perfect! All numbers are multiples of 7!"
+            }
+        ];
+
+        function getRandomObjective() {
+            // If all objectives have been used, reset the used objectives
+            if (usedObjectives.size === circularQueueObjectives.length) {
+                usedObjectives.clear();
+            }
+
+            // Get a random objective that hasn't been used recently
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * circularQueueObjectives.length);
+            } while (usedObjectives.has(randomIndex));
+
+            usedObjectives.add(randomIndex);
+            currentObjectiveIndex = randomIndex;
+            return randomIndex;
+        }
+
+        function setRandomCircularQueueObjective() {
+            const randomIndex = getRandomObjective();
+            let objective = circularQueueObjectives[randomIndex].task;
+            objective = objective.replace('{size}', MAX_SIZE);
+            objective = objective.replace('{size/2}', Math.floor(MAX_SIZE / 2));
+            document.getElementById('circularQueueObjective').textContent = objective;
+        }
+
+        function checkCircularQueueObjective() {
+            if (currentObjectiveIndex === -1) return;
+            
+            const currentObjective = circularQueueObjectives[currentObjectiveIndex];
+            if (currentObjective.check()) {
+                showMessage(currentObjective.message, "success");
+                setTimeout(setRandomCircularQueueObjective, 2000);
+            }
+        }
+
+        // Initialize when document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+            
+            // Sound control button
+            const soundControl = document.getElementById('soundControl');
+            soundControl.addEventListener('click', () => {
+                const isMuted = soundEffect.toggleMute();
+                soundControl.classList.toggle('muted', isMuted);
+            });
+
+            setRandomCircularQueueObjective();  // Set initial objective
+
+            // Add Enter key support for setting size
+            document.getElementById('queueSizeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    setQueueSize();
+                }
+            });
+        });
+
+        function setQueueSize() {
+            const sizeInput = document.getElementById('queueSizeInput');
+            const sizeVal = parseInt(sizeInput.value);
+            const warning = document.getElementById('sizeWarning');
+
+            if (sizeVal >= 1 && sizeVal <= 9) {
+                MAX_SIZE = sizeVal;
+                queue = new Array(MAX_SIZE).fill(null);
+                front = 0;
+                rear = -1;
+                size = 0;
+                updateDisplay();
+                warning.style.display = 'none';
+                showMessage(`Queue size set to ${sizeVal}`, "success");
+            } else {
+                warning.style.display = 'block';
+                showMessage("Please enter a size between 1 and 9", "error");
+            }
+        }
+
+        function enqueue() {
+            const input = document.getElementById('elementInput');
+            const value = input.value.trim();
+
+            if (!value) return;
+
+            if (value.length > 4) {
+                showMessage("Value is too long! Maximum 4 digits allowed.", "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            if (!/^\d{1,4}$/.test(value)) {
+                showMessage("Please enter only digits (0-9)!", "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            if (size === MAX_SIZE) {
+                showMessage("Queue is full!", "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            rear = (rear + 1) % MAX_SIZE;
+            queue[rear] = value;
+            size++;
+
+            updateDisplay();
+            soundEffect.playEnqueueSound();
+            input.value = '';
+
+            checkCircularQueueObjective();  // Add this at the end
+        }
+
+        function dequeue() {
+            if (size === 0) {
+                showMessage("Queue is empty!", "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            queue[front] = null;
+            front = (front + 1) % MAX_SIZE;
+            size--;
+
+            updateDisplay();
+            soundEffect.playDequeueSound();
+
+            checkCircularQueueObjective();  // Add this at the end
+        }
+
+        function peek() {
+            if (size === 0) {
+                showMessage("Queue is empty!", "error");
+                soundEffect.playErrorSound();
+                return;
+            }
+
+            const frontElement = queue[front];
+            soundEffect.playPeekSound();
+            
+            // Create peek overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'peek-overlay';
+            
+            const content = document.createElement('div');
+            content.className = 'peek-content';
+            
+            const value = document.createElement('div');
+            value.className = 'peek-value';
+            value.textContent = frontElement;
+            
+            content.appendChild(value);
+            overlay.appendChild(content);
+            document.body.appendChild(overlay);
+            
+            // Show overlay with animation
+            setTimeout(() => {
+                overlay.classList.add('visible');
+            }, 10);
+            
+            // Remove overlay after animation
+            setTimeout(() => {
+                overlay.classList.remove('visible');
+                setTimeout(() => {
+                    overlay.remove();
+                }, 300);
+            }, 1000);
+        }
+
+        function updateDisplay() {
+            const container = document.getElementById('circularQueue');
+            container.innerHTML = '';
+
+            const centerX = 200;
+            const centerY = 200;
+            const radius = 150;
+
+            // Create slots in a circle
+            for (let i = 0; i < MAX_SIZE; i++) {
+                // Calculate position on the circle
+                // Start from top (-90 degrees or -π/2) and go clockwise
+                const angle = (i * 2 * Math.PI) / MAX_SIZE - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                const slot = document.createElement('div');
+                slot.className = 'circular-queue-slot' + (queue[i] === null ? ' empty' : '');
+                slot.style.left = x + 'px';
+                slot.style.top = y + 'px';
+                
+                if (queue[i] !== null) {
+                    slot.textContent = queue[i];
+                }
+
+                // Add indicators for front and rear
+                if (size > 0) {
+                    if (i === front) {
+                        slot.classList.add('front');
+                        // Add front indicator
+                        const frontIndicator = document.createElement('div');
+                        frontIndicator.className = 'position-indicator front';
+                        frontIndicator.textContent = 'Front';
+                        frontIndicator.style.left = (x + (radius * 0.3) * Math.cos(angle)) + 'px';
+                        frontIndicator.style.top = (y + (radius * 0.3) * Math.sin(angle)) + 'px';
+                        container.appendChild(frontIndicator);
+                    }
+                    if (i === rear) {
+                        slot.classList.add('rear');
+                        // Add rear indicator
+                        const rearIndicator = document.createElement('div');
+                        rearIndicator.className = 'position-indicator rear';
+                        rearIndicator.textContent = 'Rear';
+                        rearIndicator.style.left = (x + (radius * 0.3) * Math.cos(angle)) + 'px';
+                        rearIndicator.style.top = (y + (radius * 0.3) * Math.sin(angle)) + 'px';
+                        container.appendChild(rearIndicator);
+                    }
+                }
+
+                container.appendChild(slot);
+            }
+        }
+
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('gameMessage');
+            messageElement.textContent = message;
+            messageElement.className = `game-message ${type}`;
+            messageElement.style.display = 'block';
+            
+            setTimeout(() => {
+                messageElement.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

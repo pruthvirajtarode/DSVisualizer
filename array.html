@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Arrays in Data Structures</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #050774; /* solid color */
+            --secondary-gradient: linear-gradient(90deg, #000000 0%, #ffffff 100%);
+            --accent-color: #e74c3c;
+            --background-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .array-info, .characteristics, .complexity, .applications, .pseudocode {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .array-info:hover, .characteristics:hover, .complexity:hover, .applications:hover, .pseudocode:hover {
+            transform: translateY(-5px);
+        }
+
+        .array-image {
+            text-align: center;
+            margin: 2rem 0;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .array-image:hover {
+            transform: scale(1.02);
+        }
+
+        .array-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .array-image img.two-d-array {
+            max-width: 70%;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .array-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .array-image p {
+            margin-top: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--background-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        li:before {
+            content: "→";
+            color: var(--secondary-color);
+            position: absolute;
+            left: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            transform: translateX(10px);
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        li:hover:before {
+            color: white;
+        }
+
+        pre {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        pre::before {
+            content: "Pseudocode";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem auto;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .array-info, .characteristics, .complexity, .applications, .pseudocode {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Animation classes */
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back to Home</button>
+    
+    <div class="container animate-fade-in">
+        <h1 class="animate-slide-up">Arrays in Data Structures</h1>
+        
+        <div class="array-info animate-slide-up">
+            <h2>Introduction to Arrays</h2>
+            <p>
+                An array is a linear data structure that stores elements of the same data type in contiguous memory locations. 
+                It provides direct access to elements using an index, making it one of the most fundamental and widely used data structures. 
+                Arrays can be one-dimensional (1D), two-dimensional (2D), or multi-dimensional, each serving different purposes in data organization and manipulation.
+            </p>
+        </div>
+
+        <div class="array-image animate-slide-up">
+            <h2>1D Array</h2>
+            <img src="oneDarray.png" alt="1D Array Representation">
+            <p>A one-dimensional array is a linear collection of elements accessed using a single index. It's the simplest form of array where elements are stored in a single row.</p>
+        </div>
+
+        <div class="array-image animate-slide-up">
+            <h2>2D Array</h2>
+            <img src="2darray.png" alt="2D Array Representation" class="two-d-array">
+            <p>A two-dimensional array is a matrix-like structure where elements are arranged in rows and columns. It requires two indices to access elements: one for row and one for column.</p>
+        </div>
+
+        <div class="array-image animate-slide-up">
+            <h2>3D Array</h2>
+            <img src="3darray.png" alt="3D Array Representation">
+            <p>A three-dimensional array extends the concept to three dimensions, useful for representing 3D data like RGB images or 3D coordinates in space.</p>
+        </div>
+
+        <div class="characteristics animate-slide-up">
+            <h2>Key Characteristics of Arrays</h2>
+            <ul>
+                <li>Fixed Size: Arrays have a fixed size that must be declared at creation time</li>
+                <li>Contiguous Memory: Elements are stored in adjacent memory locations</li>
+                <li>Random Access: Direct access to any element using index in O(1) time</li>
+                <li>Homogeneous Elements: All elements must be of the same data type</li>
+                <li>Index-based: Elements are accessed using zero-based indexing</li>
+                <li>Cache-friendly: Due to contiguous memory allocation, arrays have good cache locality</li>
+            </ul>
+        </div>
+
+        <div class="complexity animate-slide-up">
+            <h2>Time Complexity</h2>
+            <ul>
+                <li>Access: O(1) - Direct access using index</li>
+                <li>Search: O(n) - Linear search through elements</li>
+                <li>Insertion: O(n) - Requires shifting elements</li>
+                <li>Deletion: O(n) - Requires shifting elements</li>
+                <li>Update: O(1) - Direct access and update</li>
+            </ul>
+        </div>
+
+        <div class="applications animate-slide-up">
+            <h2>Applications of Arrays</h2>
+            <ul>
+                <li>Image Processing: Storing pixel data in 2D arrays</li>
+                <li>Matrix Operations: Used in mathematical computations</li>
+                <li>Database Records: Storing records in tabular format</li>
+                <li>Game Development: Representing game boards and grids</li>
+                <li>Audio Processing: Storing audio samples</li>
+                <li>Dynamic Programming: Storing intermediate results</li>
+            </ul>
+        </div>
+
+        <div class="pseudocode animate-slide-up">
+            <h2>Basic Array Operations Pseudocode</h2>
+            <pre>
+// Array Declaration
+array = [1, 2, 3, 4, 5]
+
+// Accessing Element
+element = array[index]
+
+// Inserting Element
+function insert(array, index, element):
+    for i = array.length - 1 to index:
+        array[i + 1] = array[i]
+    array[index] = element
+
+// Deleting Element
+function delete(array, index):
+    for i = index to array.length - 2:
+        array[i] = array[i + 1]
+    array.length = array.length - 1
+
+// Searching Element
+function search(array, target):
+    for i = 0 to array.length - 1:
+        if array[i] == target:
+            return i
+    return -1
+            </pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

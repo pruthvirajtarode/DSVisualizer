@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Array Quiz - Easy Level</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .quiz-container {
+            background: #fff;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 700px;
+            width: 95vw;
+            margin: 2rem auto;
+            text-align: left;
+        }
+        h1 {
+            font-size: 2.3rem;
+            font-weight: bold;
+            margin-bottom: 1.2rem;
+            color: #2d6a4f;
+            text-align: center;
+        }
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .options {
+            margin-bottom: 1.2rem;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            margin: 0.4rem 0;
+            padding: 0.8rem 1rem;
+            font-size: 1.08rem;
+            border-radius: 12px;
+            border: 2px solid #e3f6e5;
+            background: #f6fffa;
+            color: #217a36;
+            font-weight: 500;
+            text-align: left;
+            transition: background 0.2s, border 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .option-btn.selected {
+            background: #cbe9d7;
+            border: 2px solid #88d8b0;
+            color: #145c2c;
+        }
+        .option-btn.correct {
+            background: #a8e6cf;
+            border: 2px solid #2ecc40;
+            color: #217a36;
+        }
+        .option-btn.incorrect {
+            background: #ffb3b3;
+            border: 2px solid #ff8b8b;
+            color: #b91c1c;
+        }
+        .feedback {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+        }
+        .score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d6a4f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .next-btn, .restart-btn {
+            display: inline-block;
+            padding: 0.7rem 2.2rem;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        .next-btn:hover, .restart-btn:hover {
+            background: linear-gradient(90deg, #cbe9d7 0%, #e3f6e5 100%);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .final-score, .next-level-container {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #217a36;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .next-level-container {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s, transform 0.7s;
+            margin-top: 2.5rem;
+        }
+        .next-level-container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .next-level-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(90deg, #e3f6e5 0%, #cbe9d7 100%);
+            color: #217a36;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 16px rgba(139, 115, 85, 0.08);
+            transition: background 0.2s, transform 0.2s;
+            cursor: pointer;
+            opacity: 0;
+            animation: fadeInBtn 1s 0.7s forwards;
+        }
+        @keyframes fadeInBtn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1 id="quizTitle">Array Quiz - Easy Level</h1>
+        <div id="quiz"></div>
+    </div>
+    <script>
+    const easyQuestions = [
+        {q: "Which of the following best describes an array?", options: ["A collection of different data types", "A collection of elements stored randomly", "A fixed-size collection of elements of the same type", "A dynamic list of elements"], answer: 2},
+        {q: "What is the index of the first element in an array?", options: ["-1", "0", "1", "Depends on language"], answer: 1},
+        {q: "Which operation is the fastest in arrays?", options: ["Insertion at beginning", "Deletion at end", "Access by index", "Search by value"], answer: 2},
+        {q: "How is an array declared in C?", options: ["int arr;", "int arr[];", "int arr[10];", "array int arr[10];"], answer: 2},
+        {q: "What will be the output of arr[2] if int arr[5] = {10, 20, 30, 40, 50};?", options: ["10", "20", "30", "40"], answer: 2},
+        {q: "Arrays are stored in:", options: ["Random locations", "Sequential memory locations", "Binary trees", "Stack memory"], answer: 1},
+        {q: "What is the size of int arr[5] in memory if int is 4 bytes?", options: ["4 bytes", "20 bytes", "10 bytes", "5 bytes"], answer: 1},
+        {q: "Which of these is a valid array initialization in Python?", options: ["int arr[5] = {1,2,3,4,5}", "arr = [1, 2, 3, 4, 5]", "array arr = new int[5]", "arr = int[5]"], answer: 1},
+        {q: "What happens if you access arr[10] in an array of size 5?", options: ["Error", "0", "Undefined behavior", "Value at index 10"], answer: 2},
+        {q: "Which of these supports dynamic arrays?", options: ["C arrays", "C++ arrays", "Python lists", "Java arrays"], answer: 2}
+    ];
+    const mediumQuestions = [
+        {q: "What is the time complexity of inserting an element at the beginning of an array?", options: ["O(1)", "O(log n)", "O(n)", "O(n^2)"], answer: 2},
+        {q: "Which of the following operations is costly in arrays?", options: ["Traversal", "Search", "Insertion at index", "Access by index"], answer: 2},
+        {q: "What does int matrix[3][4]; mean?", options: ["3 rows and 4 columns", "4 rows and 3 columns", "7 elements", "1D array"], answer: 0},
+        {q: "In a 2D array, arr[i][j], what does i represent?", options: ["Row index", "Column index", "Element value", "Pointer value"], answer: 0},
+        {q: "How many elements does a 3D array int arr[2][3][4]; contain?", options: ["6", "12", "24", "10"], answer: 2},
+        {q: "What is the output of: int arr[5] = {1, 2}; printf(\"%d\", arr[4]);", options: ["0", "2", "Garbage", "Compilation error"], answer: 0},
+        {q: "Which of the following can be used for array traversal?", options: ["for loop", "while loop", "foreach (in some languages)", "All of the above"], answer: 3},
+        {q: "Which type of array has different number of columns in each row?", options: ["2D static array", "Matrix", "Jagged array", "Rectangular array"], answer: 2},
+        {q: "Which of the following data structures is implemented using arrays?", options: ["Stack", "Queue", "Heap", "All of the above"], answer: 3},
+        {q: "Array indexes are:", options: ["Always negative", "Optional", "Always continuous integers", "Alphabetic"], answer: 2}
+    ];
+    const hardQuestions = [
+        {q: "In row-major order, how is arr[i][j] located in memory?", options: ["base + (i * cols + j) * size", "base + (j * rows + i) * size", "base + (i + j) * size", "base + i + j"], answer: 0},
+        {q: "Which of the following best describes sparse arrays?", options: ["Arrays with duplicate elements", "Arrays with mostly zero elements", "Arrays with all values same", "Arrays with negative values"], answer: 1},
+        {q: "Which memory allocation technique is preferred for large arrays?", options: ["Stack", "Heap", "Queue", "Static allocation"], answer: 1},
+        {q: "In C, which keyword is used to dynamically allocate arrays?", options: ["create", "malloc", "alloc", "new"], answer: 1},
+        {q: "What is the best case time complexity of linear search on array?", options: ["O(1)", "O(n)", "O(log n)", "O(n^2)"], answer: 0},
+        {q: "If an array is sorted, which searching algorithm is preferred?", options: ["Linear search", "Binary search", "Hash search", "Depth search"], answer: 1},
+        {q: "What is the time complexity of deleting an element at index i in array?", options: ["O(1)", "O(log n)", "O(n - i)", "O(n)"], answer: 2},
+        {q: "In a 2D array of dimensions [m][n], how to calculate total memory (int = 4 bytes)?", options: ["m * n * 4", "m + n * 4", "(m + n) * 4", "(m * n) + 4"], answer: 0},
+        {q: "Which algorithm uses arrays for sorting?", options: ["Merge Sort", "Bubble Sort", "Quick Sort", "All of the above"], answer: 3},
+        {q: "What is the primary disadvantage of arrays?", options: ["High speed", "Static size", "Easy access", "Easy to implement"], answer: 1}
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let selectedOption = null;
+    let quizCompleted = false;
+    let currentLevel = 'easy';
+
+    // Get level from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const level = urlParams.get('level');
+    if (level) {
+        currentLevel = level;
+        document.getElementById('quizTitle').textContent = `Array Quiz - ${level.charAt(0).toUpperCase() + level.slice(1)} Level`;
+    }
+
+    function getCurrentQuestions() {
+        switch(currentLevel) {
+            case 'medium':
+                return mediumQuestions;
+            case 'hard':
+                return hardQuestions;
+            default:
+                return easyQuestions;
+        }
+    }
+
+    function loadQuestion() {
+        const questions = getCurrentQuestions();
+        const question = questions[currentQuestion];
+        document.getElementById('quizTitle').textContent = `Array Quiz - ${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level`;
+        document.getElementById('quiz').innerHTML = `
+            <div class="score">Score: ${score}/10</div>
+            <div class="question">${currentQuestion + 1}. ${question.q}</div>
+            <div class="options">
+                ${question.options.map((option, index) => `
+                    <button class="option-btn" onclick="selectOption(${index})">${option}</button>
+                `).join('')}
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <button class="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        `;
+    }
+
+    window.selectOption = function(index) {
+        if (quizCompleted) return;
+        const questions = getCurrentQuestions();
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach(button => button.classList.remove('selected'));
+        buttons[index].classList.add('selected');
+        selectedOption = index;
+        const correct = index === questions[currentQuestion].answer;
+        buttons.forEach(button => {
+            button.disabled = true;
+            const buttonIndex = Array.from(buttons).indexOf(button);
+            if (buttonIndex === questions[currentQuestion].answer) {
+                button.classList.add('correct');
+            } else if (buttonIndex === index && !correct) {
+                button.classList.add('incorrect');
+            }
+        });
+        if (correct) {
+            score++;
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Correct!</span>';
+        } else {
+            document.getElementById('feedback').innerHTML = '<span style="color: #000000;">Incorrect!</span>';
+        }
+        document.querySelector('.next-btn').style.display = 'inline-block';
+    }
+
+    window.nextQuestion = function() {
+        currentQuestion++;
+        selectedOption = null;
+        const questions = getCurrentQuestions();
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizCompleted = true;
+        const questions = getCurrentQuestions();
+        let resultsHtml = '';
+        if (score >= 7) {
+            let nextButtonText = '';
+            let nextButtonLink = '';
+            if (currentLevel === 'easy') {
+                nextButtonText = 'Next Level →';
+                nextButtonLink = 'quizarray.html?level=medium';
+            } else if (currentLevel === 'medium') {
+                nextButtonText = 'Next Level →';
+                nextButtonLink = 'quizarray.html?level=hard';
+            } else if (currentLevel === 'hard') {
+                nextButtonText = 'Back to Quiz Menu';
+                nextButtonLink = 'quiz.html';
+            }
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level Complete!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+                <div class="next-level-container show">
+                    <button class="next-level-btn" onclick="window.location.href='${nextButtonLink}'">${nextButtonText}</button>
+                </div>
+            `;
+        } else {
+            resultsHtml = `
+                <div class="final-score">${currentLevel.charAt(0).toUpperCase() + currentLevel.slice(1)} Level - Try Again!</div>
+                <div class="final-score">Your Score: ${score}/${questions.length}</div>
+            `;
+        }
+        document.getElementById('quiz').innerHTML = `
+            ${resultsHtml}
+            <button class="restart-btn" onclick="restartQuiz()">Restart Quiz</button>
+        `;
+    }
+
+    window.restartQuiz = function() {
+        currentQuestion = 0;
+        score = 0;
+        selectedOption = null;
+        quizCompleted = false;
+        loadQuestion();
+    }
+
+    // Initialize quiz
+    loadQuestion();
+    </script>
+</body>
+</html> 
